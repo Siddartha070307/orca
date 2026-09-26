@@ -1,0 +1,3068 @@
+{
+  "query_id": "orca_b51ef8357908",
+  "session_id": "sess_86158c0dff8a",
+  "timestamp": "2026-09-13T17:07:59.287892+00:00",
+  "user_type": "app",
+  "original_query": "Is it safe to fish near Mangalore tomorrow morning?",
+  "detected_language": "en",
+  "translated_query": "Is it safe to fish near Mangalore tomorrow morning?",
+  "location_name": "Mangalore",
+  "verdict": "SAFE",
+  "safety_summary": "[Tomorrow Morning] Status: SAFE | Wind: 14.3 km/h | Wave: 0.98 m | PFZ: 31.5km offshore",
+  "report": "**SAFETY ADVISORY: SAFE FOR OPERATIONS - FAVORABLE CONDITIONS NEAR MANGALORE [SAFE]**\n\n**Forecast Period:** Tomorrow Morning\n\nSea conditions are safe for coastal and deep-sea fishing. Recorded wind: 14.3 km/h (gusts: 36.7 km/h), significant wave height: 0.98 m, precipitation: 0 mm. Potential Fishing Zone (PFZ: FAVORABLE): PFZ-MNG-01 located 31.5 km offshore (bearing 265°), Sea Surface Temp 28.2°C with high chlorophyll-a. Target catch: Indian Mackerel, Oil Sardine. Geospatial check clear: No restricted marine or naval zone conflicts detected. Weather forecast indicates stable conditions.",
+  "dissemination_channel": "app",
+  "dispatched_payload": {
+    "channel": "app",
+    "status": "DELIVERED_IN_RESPONSE",
+    "content": {
+      "format": "rich_dashboard",
+      "text_summary": "**SAFETY ADVISORY: SAFE FOR OPERATIONS - FAVORABLE CONDITIONS NEAR MANGALORE [SAFE]**\n\n**Forecast Period:** Tomorrow Morning\n\nSea conditions are safe for coastal and deep-sea fishing. Recorded wind: 14.3 km/h (gusts: 36.7 km/h), significant wave height: 0.98 m, precipitation: 0 mm. Potential Fishing Zone (PFZ: FAVORABLE): PFZ-MNG-01 located 31.5 km offshore (bearing 265°), Sea Surface Temp 28.2°C with high chlorophyll-a. Target catch: Indian Mackerel, Oil Sardine. Geospatial check clear: No restricted marine or naval zone conflicts detected. Weather forecast indicates stable conditions.",
+      "target_ui": "ORCA Web/Mobile Client",
+      "protocol": "HTTPS_REST_API"
+    },
+    "metadata": {
+      "resolution": "high",
+      "includes_interactive_geojson": true,
+      "includes_charts": true
+    }
+  },
+  "visualization": {
+    "geojson": {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              74.84,
+              12.87
+            ]
+          },
+          "properties": {
+            "id": "user-vessel",
+            "title": "Vessel / Port Location",
+            "category": "user",
+            "marker-color": "#2563eb",
+            "marker-symbol": "ferry"
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              74.55,
+              12.85
+            ]
+          },
+          "properties": {
+            "id": "PFZ-MNG-01",
+            "title": "PFZ: PFZ-MNG-01",
+            "category": "pfz",
+            "pfz_rank": 1,
+            "is_recommended": true,
+            "marker-color": "#059669",
+            "marker-symbol": "star",
+            "lat": 12.85,
+            "lon": 74.55,
+            "sst_celsius": 28.2,
+            "chlorophyll_mg_m3": 1.45,
+            "suitability_score": 1.0,
+            "fish_density_index": 8.5,
+            "bearing_deg": 265,
+            "distance_km": 31.5,
+            "distance_user_km": 31.5,
+            "bearing_user_deg": 265,
+            "calculated_distance_km": 31.5,
+            "calculated_bearing_deg": 265,
+            "source_distance_km": 31.5,
+            "source_bearing_deg": 265,
+            "target_species": [
+              "Indian Mackerel",
+              "Oil Sardine",
+              "Seer Fish"
+            ],
+            "is_in_restricted_zone": false,
+            "ocean_feature": "Strong SST front with high chlorophyll boundary",
+            "depth_m": 45
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              74.45,
+              12.68
+            ]
+          },
+          "properties": {
+            "id": "PFZ-MNG-03",
+            "title": "PFZ #2: PFZ-MNG-03",
+            "category": "pfz",
+            "pfz_rank": 2,
+            "is_recommended": false,
+            "marker-color": "#0d9488",
+            "marker-symbol": "circle",
+            "lat": 12.68,
+            "lon": 74.45,
+            "sst_celsius": 27.9,
+            "chlorophyll_mg_m3": 1.65,
+            "suitability_score": 1.0,
+            "fish_density_index": 7.4,
+            "bearing_deg": 243,
+            "distance_km": 47.3,
+            "distance_user_km": 47.3,
+            "bearing_user_deg": 243,
+            "calculated_distance_km": 47.3,
+            "calculated_bearing_deg": 243,
+            "source_distance_km": 46.5,
+            "source_bearing_deg": 240,
+            "target_species": [
+              "Yellowfin Tuna",
+              "Ribbonfish",
+              "Pomfret"
+            ],
+            "is_in_restricted_zone": false,
+            "ocean_feature": "Outer shelf upwelling zone with cyclonic eddy boundary",
+            "depth_m": 65
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              74.62,
+              13.05
+            ]
+          },
+          "properties": {
+            "id": "PFZ-MNG-02",
+            "title": "PFZ #3: PFZ-MNG-02",
+            "category": "pfz",
+            "pfz_rank": 3,
+            "is_recommended": false,
+            "marker-color": "#0d9488",
+            "marker-symbol": "circle",
+            "lat": 13.05,
+            "lon": 74.62,
+            "sst_celsius": 28.6,
+            "chlorophyll_mg_m3": 0.95,
+            "suitability_score": 1.0,
+            "fish_density_index": 6.2,
+            "bearing_deg": 310,
+            "distance_km": 31.1,
+            "distance_user_km": 31.1,
+            "bearing_user_deg": 310,
+            "calculated_distance_km": 31.1,
+            "calculated_bearing_deg": 310,
+            "source_distance_km": 28.0,
+            "source_bearing_deg": 310,
+            "target_species": [
+              "Sardines",
+              "Squid"
+            ],
+            "is_in_restricted_zone": false,
+            "ocean_feature": "Moderate thermal gradient",
+            "depth_m": 38
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              74.68,
+              12.92
+            ]
+          },
+          "properties": {
+            "id": "PFZ-MNG-04",
+            "title": "PFZ #4: PFZ-MNG-04",
+            "category": "pfz",
+            "pfz_rank": 4,
+            "is_recommended": false,
+            "marker-color": "#0d9488",
+            "marker-symbol": "circle",
+            "lat": 12.92,
+            "lon": 74.68,
+            "sst_celsius": 28.9,
+            "chlorophyll_mg_m3": 0.82,
+            "suitability_score": 1.0,
+            "fish_density_index": 5.7,
+            "bearing_deg": 287,
+            "distance_km": 18.2,
+            "distance_user_km": 18.2,
+            "bearing_user_deg": 287,
+            "calculated_distance_km": 18.2,
+            "calculated_bearing_deg": 287,
+            "source_distance_km": 18.5,
+            "source_bearing_deg": 280,
+            "target_species": [
+              "Anchovy",
+              "Croaker",
+              "Sole Fish"
+            ],
+            "is_in_restricted_zone": false,
+            "ocean_feature": "Nearshore thermal convergence plume",
+            "depth_m": 28
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "LineString",
+            "coordinates": [
+              [
+                74.84,
+                12.87
+              ],
+              [
+                74.55,
+                12.85
+              ]
+            ]
+          },
+          "properties": {
+            "id": "nav-course-vector",
+            "title": "Course Vector (31.5 km @ 265°)",
+            "stroke": "#0284c7",
+            "stroke-width": 2.5,
+            "stroke-dasharray": "5, 5",
+            "distance_km": 31.5,
+            "bearing_deg": 265,
+            "target_pfz_id": "PFZ-MNG-01"
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  74.08,
+                  14.78
+                ],
+                [
+                  74.18,
+                  14.78
+                ],
+                [
+                  74.18,
+                  14.86
+                ],
+                [
+                  74.08,
+                  14.86
+                ],
+                [
+                  74.08,
+                  14.78
+                ]
+              ]
+            ]
+          },
+          "properties": {
+            "id": "restricted-Karwar Nav",
+            "title": "Karwar Naval Exclusion Perimeter (INS Kadamba / Project Seabird)",
+            "category": "restricted_zone",
+            "zone_type": "Naval Security Exclusion Zone",
+            "fill": "#dc2626",
+            "fill-opacity": 0.25,
+            "stroke": "#b91c1c",
+            "stroke-width": 2
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  79.0,
+                  9.1
+                ],
+                [
+                  79.35,
+                  9.1
+                ],
+                [
+                  79.35,
+                  9.3
+                ],
+                [
+                  79.0,
+                  9.3
+                ],
+                [
+                  79.0,
+                  9.1
+                ]
+              ]
+            ]
+          },
+          "properties": {
+            "id": "restricted-Gulf of Ma",
+            "title": "Gulf of Mannar Marine National Park",
+            "category": "restricted_zone",
+            "zone_type": "Marine Biosphere Reserve / National Park",
+            "fill": "#dc2626",
+            "fill-opacity": 0.25,
+            "stroke": "#b91c1c",
+            "stroke-width": 2
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  86.75,
+                  20.6
+                ],
+                [
+                  87.15,
+                  20.6
+                ],
+                [
+                  87.15,
+                  20.9
+                ],
+                [
+                  86.75,
+                  20.9
+                ],
+                [
+                  86.75,
+                  20.6
+                ]
+              ]
+            ]
+          },
+          "properties": {
+            "id": "restricted-Gahirmatha",
+            "title": "Gahirmatha Marine Sanctuary (Olive Ridley Nesting Zone)",
+            "category": "restricted_zone",
+            "zone_type": "Marine Sanctuary",
+            "fill": "#dc2626",
+            "fill-opacity": 0.25,
+            "stroke": "#b91c1c",
+            "stroke-width": 2
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  71.85,
+                  19.3
+                ],
+                [
+                  72.15,
+                  19.3
+                ],
+                [
+                  72.15,
+                  19.65
+                ],
+                [
+                  71.85,
+                  19.65
+                ],
+                [
+                  71.85,
+                  19.3
+                ]
+              ]
+            ]
+          },
+          "properties": {
+            "id": "restricted-Mumbai Off",
+            "title": "Mumbai Offshore High Security Zone (Bombay High)",
+            "category": "restricted_zone",
+            "zone_type": "Critical Infrastructure Exclusion Perimeter",
+            "fill": "#dc2626",
+            "fill-opacity": 0.25,
+            "stroke": "#b91c1c",
+            "stroke-width": 2
+          }
+        }
+      ]
+    },
+    "charts": {
+      "available": true,
+      "labels": [
+        "06:00",
+        "07:00",
+        "08:00",
+        "09:00",
+        "10:00",
+        "11:00",
+        "12:00"
+      ],
+      "timestamps": [
+        "2026-09-14T06:00",
+        "2026-09-14T07:00",
+        "2026-09-14T08:00",
+        "2026-09-14T09:00",
+        "2026-09-14T10:00",
+        "2026-09-14T11:00",
+        "2026-09-14T12:00"
+      ],
+      "source": {
+        "name": "Open-Meteo API",
+        "is_simulated": false
+      },
+      "wave_series": {
+        "name": "Significant Wave Height (m)",
+        "unit": "m",
+        "data": [
+          0.98,
+          0.98,
+          0.98,
+          0.98,
+          0.98,
+          0.98,
+          0.98
+        ],
+        "caution_threshold": 2.0,
+        "danger_threshold": 3.5
+      },
+      "wind_series": {
+        "name": "Wind Speed (km/h)",
+        "unit": "km/h",
+        "data": [
+          6.3,
+          5.1,
+          4.8,
+          7.9,
+          10.3,
+          12.2,
+          14.3
+        ],
+        "caution_threshold": 35.0,
+        "danger_threshold": 50.0
+      },
+      "gust_series": {
+        "name": "Wind Gusts (km/h)",
+        "unit": "km/h",
+        "data": [
+          12.2,
+          13.3,
+          16.2,
+          23.0,
+          28.4,
+          32.4,
+          36.7
+        ],
+        "caution_threshold": 55.0,
+        "danger_threshold": 70.0
+      },
+      "temperature_series": {
+        "name": "Air Temperature (°C)",
+        "unit": "°C",
+        "data": [
+          24.1,
+          25.6,
+          27.8,
+          29.5,
+          30.6,
+          30.6,
+          30.6
+        ]
+      },
+      "precipitation_series": {
+        "name": "Precipitation (mm)",
+        "unit": "mm",
+        "data": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "map_bounds": [
+      74.2,
+      12.43,
+      75.09,
+      13.3
+    ]
+  },
+  "agent_traces": [
+    {
+      "agent": "UserInteractionAgent",
+      "status": "success",
+      "location": null,
+      "time_range": {
+        "start": "2026-09-13T17:07:59.287795+00:00",
+        "end": "2026-09-13T17:07:59.287795+00:00"
+      },
+      "result": {
+        "original_query": "Is it safe to fish near Mangalore tomorrow morning?",
+        "detected_language": "en",
+        "translated_query": "Is it safe to fish near Mangalore tomorrow morning?",
+        "user_type": "app",
+        "pipeline_stage": "ingress_complete"
+      },
+      "confidence": 0.99,
+      "sources": [
+        {
+          "name": "Bhashini ULCA / Language Gateway",
+          "timestamp": "2026-09-13T17:07:59.287795+00:00"
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "agent": "PlanningAgent",
+      "status": "success",
+      "location": {
+        "lat": 12.87,
+        "lon": 74.84
+      },
+      "time_range": {
+        "start": "2026-09-14T06:00:00+05:30",
+        "end": "2026-09-14T12:00:00+05:30",
+        "label": "Tomorrow Morning"
+      },
+      "result": {
+        "intent": "pfz_discovery",
+        "location_name": "Mangalore",
+        "coordinates": {
+          "lat": 12.87,
+          "lon": 74.84
+        },
+        "target_time": "tomorrow morning",
+        "time_range": {
+          "start": "2026-09-14T06:00:00+05:30",
+          "end": "2026-09-14T12:00:00+05:30",
+          "label": "Tomorrow Morning",
+          "is_current": false,
+          "target_time": "tomorrow morning"
+        },
+        "task_sequence": [
+          "marine_data_discovery",
+          "weather_intelligence",
+          "ocean_analytics",
+          "geospatial_reasoning",
+          "risk_assessment",
+          "visualization",
+          "reporting",
+          "dissemination_router"
+        ]
+      },
+      "confidence": 0.98,
+      "sources": [
+        {
+          "name": "Anthropic Claude / Intent Parser",
+          "timestamp": "2026-09-13T17:07:59.287900+00:00"
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "agent": "MarineDataDiscoveryAgent",
+      "status": "success",
+      "location": {
+        "lat": 12.87,
+        "lon": 74.84
+      },
+      "time_range": {
+        "start": "2026-09-13T17:07:59.289512+00:00",
+        "end": "2026-09-13T17:07:59.289512+00:00"
+      },
+      "result": {
+        "weather_data": {
+          "source": "Open-Meteo API",
+          "status": "success",
+          "is_fallback": false,
+          "forecast_available": true,
+          "timestamp": "2026-09-13T17:08:00.993839+00:00",
+          "coordinates": {
+            "lat": 12.87,
+            "lon": 74.84
+          },
+          "current": {
+            "wind_speed_kmh": 5.7,
+            "wind_gust_kmh": 10.1,
+            "wind_direction_deg": 9,
+            "wave_height_m": 1.02,
+            "wave_period_s": 10.0,
+            "wave_direction_deg": 235,
+            "temperature_c": 26.4,
+            "weather_code": 2,
+            "has_storm_alert": false,
+            "storm_description": ""
+          },
+          "forecast_hourly": {
+            "forecast_available": true,
+            "times": [
+              "2026-09-13T00:00",
+              "2026-09-13T01:00",
+              "2026-09-13T02:00",
+              "2026-09-13T03:00",
+              "2026-09-13T04:00",
+              "2026-09-13T05:00",
+              "2026-09-13T06:00",
+              "2026-09-13T07:00",
+              "2026-09-13T08:00",
+              "2026-09-13T09:00",
+              "2026-09-13T10:00",
+              "2026-09-13T11:00",
+              "2026-09-13T12:00",
+              "2026-09-13T13:00",
+              "2026-09-13T14:00",
+              "2026-09-13T15:00",
+              "2026-09-13T16:00",
+              "2026-09-13T17:00",
+              "2026-09-13T18:00",
+              "2026-09-13T19:00",
+              "2026-09-13T20:00",
+              "2026-09-13T21:00",
+              "2026-09-13T22:00",
+              "2026-09-13T23:00",
+              "2026-09-14T00:00",
+              "2026-09-14T01:00",
+              "2026-09-14T02:00",
+              "2026-09-14T03:00",
+              "2026-09-14T04:00",
+              "2026-09-14T05:00",
+              "2026-09-14T06:00",
+              "2026-09-14T07:00",
+              "2026-09-14T08:00",
+              "2026-09-14T09:00",
+              "2026-09-14T10:00",
+              "2026-09-14T11:00",
+              "2026-09-14T12:00",
+              "2026-09-14T13:00",
+              "2026-09-14T14:00",
+              "2026-09-14T15:00",
+              "2026-09-14T16:00",
+              "2026-09-14T17:00",
+              "2026-09-14T18:00",
+              "2026-09-14T19:00",
+              "2026-09-14T20:00",
+              "2026-09-14T21:00",
+              "2026-09-14T22:00",
+              "2026-09-14T23:00",
+              "2026-09-15T00:00",
+              "2026-09-15T01:00",
+              "2026-09-15T02:00",
+              "2026-09-15T03:00",
+              "2026-09-15T04:00",
+              "2026-09-15T05:00",
+              "2026-09-15T06:00",
+              "2026-09-15T07:00",
+              "2026-09-15T08:00",
+              "2026-09-15T09:00",
+              "2026-09-15T10:00",
+              "2026-09-15T11:00",
+              "2026-09-15T12:00",
+              "2026-09-15T13:00",
+              "2026-09-15T14:00",
+              "2026-09-15T15:00",
+              "2026-09-15T16:00",
+              "2026-09-15T17:00",
+              "2026-09-15T18:00",
+              "2026-09-15T19:00",
+              "2026-09-15T20:00",
+              "2026-09-15T21:00",
+              "2026-09-15T22:00",
+              "2026-09-15T23:00"
+            ],
+            "wind_speed_kmh": [
+              6.0,
+              6.3,
+              6.6,
+              5.2,
+              5.2,
+              4.6,
+              4.4,
+              3.7,
+              5.2,
+              8.3,
+              10.2,
+              11.3,
+              13.2,
+              14.0,
+              14.9,
+              14.2,
+              13.5,
+              12.1,
+              9.8,
+              7.7,
+              6.6,
+              5.3,
+              5.7,
+              6.8,
+              6.1,
+              4.4,
+              4.6,
+              5.6,
+              6.5,
+              6.7,
+              6.3,
+              5.1,
+              4.8,
+              7.9,
+              10.3,
+              12.2,
+              14.3,
+              16.5,
+              17.3,
+              16.7,
+              15.7,
+              14.9,
+              13.4,
+              10.7,
+              10.1,
+              9.0,
+              7.8,
+              6.0,
+              6.0,
+              5.0,
+              5.7,
+              7.3,
+              7.7,
+              7.7,
+              7.5,
+              6.9,
+              6.2,
+              5.8,
+              7.2,
+              11.1,
+              14.3,
+              16.0,
+              17.3,
+              17.5,
+              16.3,
+              15.3,
+              14.0,
+              11.8,
+              10.1,
+              8.3,
+              7.3,
+              6.2
+            ],
+            "wind_gust_kmh": [
+              11.2,
+              12.2,
+              12.2,
+              12.2,
+              10.1,
+              9.7,
+              9.0,
+              10.4,
+              16.9,
+              23.8,
+              27.4,
+              32.8,
+              34.2,
+              35.6,
+              37.4,
+              37.4,
+              35.6,
+              32.8,
+              28.4,
+              21.2,
+              16.2,
+              13.3,
+              10.1,
+              12.6,
+              12.6,
+              11.2,
+              8.3,
+              10.1,
+              11.9,
+              12.2,
+              12.2,
+              13.3,
+              16.2,
+              23.0,
+              28.4,
+              32.4,
+              36.7,
+              40.7,
+              42.1,
+              42.1,
+              40.7,
+              37.1,
+              34.2,
+              29.5,
+              23.4,
+              20.9,
+              18.0,
+              14.4,
+              11.2,
+              11.2,
+              10.4,
+              13.7,
+              14.8,
+              14.4,
+              14.4,
+              16.2,
+              18.7,
+              20.2,
+              23.4,
+              30.6,
+              37.1,
+              40.0,
+              42.1,
+              42.5,
+              42.1,
+              38.5,
+              34.9,
+              29.9,
+              24.8,
+              20.2,
+              15.8,
+              14.0
+            ],
+            "wave_height_m": [
+              1.08,
+              1.06,
+              1.04,
+              1.04,
+              1.04,
+              1.04,
+              1.04,
+              1.04,
+              1.04,
+              1.04,
+              1.04,
+              1.04,
+              1.04,
+              1.02,
+              1.02,
+              1.02,
+              1.02,
+              1.02,
+              1.02,
+              1.0,
+              1.0,
+              1.0,
+              1.02,
+              1.02,
+              1.02,
+              1.0,
+              1.0,
+              1.0,
+              0.98,
+              0.98,
+              0.98,
+              0.98,
+              0.98,
+              0.98,
+              0.98,
+              0.98,
+              0.98,
+              0.98,
+              0.98,
+              0.98,
+              0.98,
+              0.98,
+              0.98,
+              0.98,
+              0.98,
+              0.98,
+              0.98,
+              0.98,
+              0.98,
+              0.98,
+              0.98,
+              0.98,
+              0.98,
+              0.98,
+              0.98,
+              0.96,
+              0.96,
+              0.96,
+              0.96,
+              0.96,
+              0.96,
+              0.94,
+              0.94,
+              0.94,
+              0.96,
+              0.96,
+              0.96,
+              0.94,
+              0.94,
+              0.94,
+              0.94,
+              0.94
+            ],
+            "temperature_c": [
+              26.5,
+              26.0,
+              25.9,
+              25.7,
+              25.6,
+              25.7,
+              25.4,
+              26.5,
+              28.1,
+              28.8,
+              29.2,
+              30.9,
+              30.7,
+              30.5,
+              30.4,
+              30.0,
+              29.2,
+              28.6,
+              27.7,
+              27.3,
+              27.0,
+              26.7,
+              26.4,
+              26.0,
+              25.6,
+              25.4,
+              25.1,
+              25.0,
+              24.8,
+              24.5,
+              24.1,
+              25.6,
+              27.8,
+              29.5,
+              30.6,
+              30.6,
+              30.6,
+              30.1,
+              30.0,
+              29.4,
+              28.8,
+              27.9,
+              27.3,
+              27.0,
+              26.8,
+              26.6,
+              26.2,
+              25.8,
+              25.5,
+              25.2,
+              24.9,
+              24.6,
+              24.2,
+              23.9,
+              23.6,
+              25.1,
+              27.3,
+              29.2,
+              30.7,
+              31.1,
+              30.9,
+              30.5,
+              30.1,
+              29.4,
+              28.7,
+              27.9,
+              27.0,
+              26.6,
+              26.3,
+              26.2,
+              26.1,
+              25.6
+            ],
+            "precipitation_mm": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.1,
+              0.0,
+              0.0,
+              0.0,
+              0.1,
+              0.3,
+              0.4,
+              0.2,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "weather_code": [
+              3,
+              3,
+              3,
+              3,
+              51,
+              3,
+              3,
+              3,
+              51,
+              51,
+              51,
+              51,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              2,
+              0,
+              2,
+              2,
+              3,
+              3,
+              1,
+              2,
+              3,
+              3,
+              3,
+              2,
+              3,
+              3,
+              3,
+              3,
+              1,
+              0,
+              0,
+              1,
+              2,
+              2,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              1,
+              0,
+              0,
+              0,
+              1,
+              2,
+              1,
+              0,
+              0,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              1,
+              3,
+              3
+            ]
+          },
+          "forecast_24h": {
+            "forecast_available": true,
+            "times": [
+              "2026-09-13T00:00",
+              "2026-09-13T01:00",
+              "2026-09-13T02:00",
+              "2026-09-13T03:00",
+              "2026-09-13T04:00",
+              "2026-09-13T05:00",
+              "2026-09-13T06:00",
+              "2026-09-13T07:00",
+              "2026-09-13T08:00",
+              "2026-09-13T09:00",
+              "2026-09-13T10:00",
+              "2026-09-13T11:00",
+              "2026-09-13T12:00",
+              "2026-09-13T13:00",
+              "2026-09-13T14:00",
+              "2026-09-13T15:00",
+              "2026-09-13T16:00",
+              "2026-09-13T17:00",
+              "2026-09-13T18:00",
+              "2026-09-13T19:00",
+              "2026-09-13T20:00",
+              "2026-09-13T21:00",
+              "2026-09-13T22:00",
+              "2026-09-13T23:00"
+            ],
+            "wind_speed_kmh": [
+              6.0,
+              6.3,
+              6.6,
+              5.2,
+              5.2,
+              4.6,
+              4.4,
+              3.7,
+              5.2,
+              8.3,
+              10.2,
+              11.3,
+              13.2,
+              14.0,
+              14.9,
+              14.2,
+              13.5,
+              12.1,
+              9.8,
+              7.7,
+              6.6,
+              5.3,
+              5.7,
+              6.8
+            ],
+            "wave_height_m": [
+              1.08,
+              1.06,
+              1.04,
+              1.04,
+              1.04,
+              1.04,
+              1.04,
+              1.04,
+              1.04,
+              1.04,
+              1.04,
+              1.04,
+              1.04,
+              1.02,
+              1.02,
+              1.02,
+              1.02,
+              1.02,
+              1.02,
+              1.0,
+              1.0,
+              1.0,
+              1.02,
+              1.02
+            ]
+          }
+        },
+        "pfz_bulletins": [
+          {
+            "id": "PFZ-MNG-01",
+            "lat": 12.85,
+            "lon": 74.55,
+            "bearing_deg": 265,
+            "distance_km": 31.5,
+            "depth_m": 45,
+            "sst_c": 28.2,
+            "chlorophyll_mg_m3": 1.45,
+            "suitability_score": 0.91,
+            "target_species": [
+              "Indian Mackerel",
+              "Oil Sardine",
+              "Seer Fish"
+            ],
+            "feature": "Strong SST front with high chlorophyll boundary",
+            "fish_density_index": 8.5,
+            "bulletin_id": "INCOIS-PFZ-MANGALORE-2026",
+            "sector": "Mangalore",
+            "state": "Karnataka",
+            "sector_match_distance_km": 0.0,
+            "generated_at": "2026-09-13T17:08:00.994224+00:00",
+            "valid_until": "2026-09-15T17:08:00.994224+00:00",
+            "source_distance_km": 31.5,
+            "source_bearing_deg": 265,
+            "distance_user_km": 31.5,
+            "bearing_user_deg": 265,
+            "calculated_distance_km": 31.5,
+            "calculated_bearing_deg": 265,
+            "is_simulated": true
+          },
+          {
+            "id": "PFZ-MNG-03",
+            "lat": 12.68,
+            "lon": 74.45,
+            "bearing_deg": 243,
+            "distance_km": 47.3,
+            "depth_m": 65,
+            "sst_c": 27.9,
+            "chlorophyll_mg_m3": 1.65,
+            "suitability_score": 0.88,
+            "target_species": [
+              "Yellowfin Tuna",
+              "Ribbonfish",
+              "Pomfret"
+            ],
+            "feature": "Outer shelf upwelling zone with cyclonic eddy boundary",
+            "fish_density_index": 7.4,
+            "bulletin_id": "INCOIS-PFZ-MANGALORE-2026",
+            "sector": "Mangalore",
+            "state": "Karnataka",
+            "sector_match_distance_km": 0.0,
+            "generated_at": "2026-09-13T17:08:00.994224+00:00",
+            "valid_until": "2026-09-15T17:08:00.994224+00:00",
+            "source_distance_km": 46.5,
+            "source_bearing_deg": 240,
+            "distance_user_km": 47.3,
+            "bearing_user_deg": 243,
+            "calculated_distance_km": 47.3,
+            "calculated_bearing_deg": 243,
+            "is_simulated": true
+          },
+          {
+            "id": "PFZ-MNG-02",
+            "lat": 13.05,
+            "lon": 74.62,
+            "bearing_deg": 310,
+            "distance_km": 31.1,
+            "depth_m": 38,
+            "sst_c": 28.6,
+            "chlorophyll_mg_m3": 0.95,
+            "suitability_score": 0.79,
+            "target_species": [
+              "Sardines",
+              "Squid"
+            ],
+            "feature": "Moderate thermal gradient",
+            "fish_density_index": 6.2,
+            "bulletin_id": "INCOIS-PFZ-MANGALORE-2026",
+            "sector": "Mangalore",
+            "state": "Karnataka",
+            "sector_match_distance_km": 0.0,
+            "generated_at": "2026-09-13T17:08:00.994224+00:00",
+            "valid_until": "2026-09-15T17:08:00.994224+00:00",
+            "source_distance_km": 28.0,
+            "source_bearing_deg": 310,
+            "distance_user_km": 31.1,
+            "bearing_user_deg": 310,
+            "calculated_distance_km": 31.1,
+            "calculated_bearing_deg": 310,
+            "is_simulated": true
+          },
+          {
+            "id": "PFZ-MNG-04",
+            "lat": 12.92,
+            "lon": 74.68,
+            "bearing_deg": 287,
+            "distance_km": 18.2,
+            "depth_m": 28,
+            "sst_c": 28.9,
+            "chlorophyll_mg_m3": 0.82,
+            "suitability_score": 0.74,
+            "target_species": [
+              "Anchovy",
+              "Croaker",
+              "Sole Fish"
+            ],
+            "feature": "Nearshore thermal convergence plume",
+            "fish_density_index": 5.7,
+            "bulletin_id": "INCOIS-PFZ-MANGALORE-2026",
+            "sector": "Mangalore",
+            "state": "Karnataka",
+            "sector_match_distance_km": 0.0,
+            "generated_at": "2026-09-13T17:08:00.994224+00:00",
+            "valid_until": "2026-09-15T17:08:00.994224+00:00",
+            "source_distance_km": 18.5,
+            "source_bearing_deg": 280,
+            "distance_user_km": 18.2,
+            "bearing_user_deg": 287,
+            "calculated_distance_km": 18.2,
+            "calculated_bearing_deg": 287,
+            "is_simulated": true
+          }
+        ],
+        "discovered_sources": [
+          "Open-Meteo",
+          "INCOIS-PFZ"
+        ],
+        "query_location": {
+          "lat": 12.87,
+          "lon": 74.84
+        }
+      },
+      "confidence": 0.96,
+      "sources": [
+        {
+          "name": "Open-Meteo Live Marine API",
+          "timestamp": "2026-09-13T17:08:00.993839+00:00",
+          "is_simulated": false
+        },
+        {
+          "name": "INCOIS Potential Fishing Zone Mission (Simulated)",
+          "timestamp": "2026-09-13T17:07:59.289512+00:00",
+          "is_simulated": true
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "agent": "WeatherIntelligenceAgent",
+      "status": "success",
+      "location": {
+        "lat": 12.87,
+        "lon": 74.84
+      },
+      "time_range": {
+        "start": "2026-09-14T06:00:00+05:30",
+        "end": "2026-09-14T12:00:00+05:30",
+        "label": "Tomorrow Morning",
+        "is_current": false
+      },
+      "result": {
+        "verdict": "SAFE",
+        "metrics": {
+          "wind_speed_kmh": 14.3,
+          "wave_height_m": 0.98,
+          "wind_gust_kmh": 36.7,
+          "has_storm_alert": false,
+          "weather_code": null,
+          "forecast_available": true
+        },
+        "reasons": [
+          "NORMAL: Favorable weather conditions with wind speed at 14.3 km/h and wave height at 0.98 m."
+        ],
+        "sea_state": "Smooth",
+        "time_range": {
+          "start": "2026-09-14T06:00:00+05:30",
+          "end": "2026-09-14T12:00:00+05:30",
+          "label": "Tomorrow Morning",
+          "is_current": false
+        },
+        "evaluated_window": {
+          "start": "2026-09-14T06:00:00+05:30",
+          "end": "2026-09-14T12:00:00+05:30",
+          "label": "Tomorrow Morning",
+          "is_current": false,
+          "data_points_evaluated": 7,
+          "peak_wind_kmh": 14.3,
+          "peak_wave_m": 0.98,
+          "peak_gust_kmh": 36.7,
+          "has_storm_alert": false
+        },
+        "hourly_series": {
+          "times": [
+            "2026-09-14T06:00",
+            "2026-09-14T07:00",
+            "2026-09-14T08:00",
+            "2026-09-14T09:00",
+            "2026-09-14T10:00",
+            "2026-09-14T11:00",
+            "2026-09-14T12:00"
+          ],
+          "wind_speed_kmh": [
+            6.3,
+            5.1,
+            4.8,
+            7.9,
+            10.3,
+            12.2,
+            14.3
+          ],
+          "wave_height_m": [
+            0.98,
+            0.98,
+            0.98,
+            0.98,
+            0.98,
+            0.98,
+            0.98
+          ],
+          "wind_gust_kmh": [
+            12.2,
+            13.3,
+            16.2,
+            23.0,
+            28.4,
+            32.4,
+            36.7
+          ],
+          "temperature_c": [
+            24.1,
+            25.6,
+            27.8,
+            29.5,
+            30.6,
+            30.6,
+            30.6
+          ],
+          "precipitation_mm": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "forecast_peak_24h": {
+          "peak_wind_kmh": 14.9,
+          "peak_wave_m": 1.08
+        }
+      },
+      "confidence": 0.95,
+      "sources": [
+        {
+          "name": "Open-Meteo API",
+          "timestamp": "2026-09-13T17:08:00.993839+00:00"
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "agent": "OceanAnalyticsAgent",
+      "status": "success",
+      "location": {
+        "lat": 12.87,
+        "lon": 74.84
+      },
+      "time_range": {
+        "start": "2026-09-13T17:08:00.994662+00:00",
+        "end": "2026-09-15T17:08:00.994224+00:00"
+      },
+      "result": {
+        "verdict": "FAVORABLE",
+        "recommended_pfz": {
+          "id": "PFZ-MNG-01",
+          "lat": 12.85,
+          "lon": 74.55,
+          "bearing_deg": 265,
+          "distance_km": 31.5,
+          "depth_m": 45,
+          "sst_c": 28.2,
+          "chlorophyll_mg_m3": 1.45,
+          "suitability_score": 0.91,
+          "target_species": [
+            "Indian Mackerel",
+            "Oil Sardine",
+            "Seer Fish"
+          ],
+          "feature": "Strong SST front with high chlorophyll boundary",
+          "fish_density_index": 8.5,
+          "bulletin_id": "INCOIS-PFZ-MANGALORE-2026",
+          "sector": "Mangalore",
+          "state": "Karnataka",
+          "sector_match_distance_km": 0.0,
+          "generated_at": "2026-09-13T17:08:00.994224+00:00",
+          "valid_until": "2026-09-15T17:08:00.994224+00:00",
+          "source_distance_km": 31.5,
+          "source_bearing_deg": 265,
+          "distance_user_km": 31.5,
+          "bearing_user_deg": 265,
+          "calculated_distance_km": 31.5,
+          "calculated_bearing_deg": 265,
+          "is_simulated": true,
+          "evaluated_suitability": 1.0,
+          "sst_analysis": {
+            "value_c": 28.2,
+            "status": "OPTIMAL",
+            "optimal_range": [
+              26.5,
+              30.5
+            ],
+            "is_optimal": true
+          },
+          "chlorophyll_analysis": {
+            "value_mg_m3": 1.45,
+            "status": "OPTIMAL",
+            "optimal_range": [
+              0.2,
+              3.0
+            ],
+            "is_optimal": true
+          },
+          "thermal_front": {
+            "calculation_available": false,
+            "gradient_c_per_km": null,
+            "front_detected": false,
+            "analysis_note": "Insufficient spatial grid data; horizontal SST gradient calculation unavailable without local grid observations."
+          },
+          "pfz_rank": 1,
+          "is_recommended": true
+        },
+        "candidates": [
+          {
+            "id": "PFZ-MNG-01",
+            "lat": 12.85,
+            "lon": 74.55,
+            "bearing_deg": 265,
+            "distance_km": 31.5,
+            "depth_m": 45,
+            "sst_c": 28.2,
+            "chlorophyll_mg_m3": 1.45,
+            "suitability_score": 0.91,
+            "target_species": [
+              "Indian Mackerel",
+              "Oil Sardine",
+              "Seer Fish"
+            ],
+            "feature": "Strong SST front with high chlorophyll boundary",
+            "fish_density_index": 8.5,
+            "bulletin_id": "INCOIS-PFZ-MANGALORE-2026",
+            "sector": "Mangalore",
+            "state": "Karnataka",
+            "sector_match_distance_km": 0.0,
+            "generated_at": "2026-09-13T17:08:00.994224+00:00",
+            "valid_until": "2026-09-15T17:08:00.994224+00:00",
+            "source_distance_km": 31.5,
+            "source_bearing_deg": 265,
+            "distance_user_km": 31.5,
+            "bearing_user_deg": 265,
+            "calculated_distance_km": 31.5,
+            "calculated_bearing_deg": 265,
+            "is_simulated": true,
+            "evaluated_suitability": 1.0,
+            "sst_analysis": {
+              "value_c": 28.2,
+              "status": "OPTIMAL",
+              "optimal_range": [
+                26.5,
+                30.5
+              ],
+              "is_optimal": true
+            },
+            "chlorophyll_analysis": {
+              "value_mg_m3": 1.45,
+              "status": "OPTIMAL",
+              "optimal_range": [
+                0.2,
+                3.0
+              ],
+              "is_optimal": true
+            },
+            "thermal_front": {
+              "calculation_available": false,
+              "gradient_c_per_km": null,
+              "front_detected": false,
+              "analysis_note": "Insufficient spatial grid data; horizontal SST gradient calculation unavailable without local grid observations."
+            },
+            "pfz_rank": 1,
+            "is_recommended": true
+          },
+          {
+            "id": "PFZ-MNG-03",
+            "lat": 12.68,
+            "lon": 74.45,
+            "bearing_deg": 243,
+            "distance_km": 47.3,
+            "depth_m": 65,
+            "sst_c": 27.9,
+            "chlorophyll_mg_m3": 1.65,
+            "suitability_score": 0.88,
+            "target_species": [
+              "Yellowfin Tuna",
+              "Ribbonfish",
+              "Pomfret"
+            ],
+            "feature": "Outer shelf upwelling zone with cyclonic eddy boundary",
+            "fish_density_index": 7.4,
+            "bulletin_id": "INCOIS-PFZ-MANGALORE-2026",
+            "sector": "Mangalore",
+            "state": "Karnataka",
+            "sector_match_distance_km": 0.0,
+            "generated_at": "2026-09-13T17:08:00.994224+00:00",
+            "valid_until": "2026-09-15T17:08:00.994224+00:00",
+            "source_distance_km": 46.5,
+            "source_bearing_deg": 240,
+            "distance_user_km": 47.3,
+            "bearing_user_deg": 243,
+            "calculated_distance_km": 47.3,
+            "calculated_bearing_deg": 243,
+            "is_simulated": true,
+            "evaluated_suitability": 1.0,
+            "sst_analysis": {
+              "value_c": 27.9,
+              "status": "OPTIMAL",
+              "optimal_range": [
+                26.5,
+                30.5
+              ],
+              "is_optimal": true
+            },
+            "chlorophyll_analysis": {
+              "value_mg_m3": 1.65,
+              "status": "OPTIMAL",
+              "optimal_range": [
+                0.2,
+                3.0
+              ],
+              "is_optimal": true
+            },
+            "thermal_front": {
+              "calculation_available": false,
+              "gradient_c_per_km": null,
+              "front_detected": false,
+              "analysis_note": "Insufficient spatial grid data; horizontal SST gradient calculation unavailable without local grid observations."
+            },
+            "pfz_rank": 2,
+            "is_recommended": false
+          },
+          {
+            "id": "PFZ-MNG-02",
+            "lat": 13.05,
+            "lon": 74.62,
+            "bearing_deg": 310,
+            "distance_km": 31.1,
+            "depth_m": 38,
+            "sst_c": 28.6,
+            "chlorophyll_mg_m3": 0.95,
+            "suitability_score": 0.79,
+            "target_species": [
+              "Sardines",
+              "Squid"
+            ],
+            "feature": "Moderate thermal gradient",
+            "fish_density_index": 6.2,
+            "bulletin_id": "INCOIS-PFZ-MANGALORE-2026",
+            "sector": "Mangalore",
+            "state": "Karnataka",
+            "sector_match_distance_km": 0.0,
+            "generated_at": "2026-09-13T17:08:00.994224+00:00",
+            "valid_until": "2026-09-15T17:08:00.994224+00:00",
+            "source_distance_km": 28.0,
+            "source_bearing_deg": 310,
+            "distance_user_km": 31.1,
+            "bearing_user_deg": 310,
+            "calculated_distance_km": 31.1,
+            "calculated_bearing_deg": 310,
+            "is_simulated": true,
+            "evaluated_suitability": 1.0,
+            "sst_analysis": {
+              "value_c": 28.6,
+              "status": "OPTIMAL",
+              "optimal_range": [
+                26.5,
+                30.5
+              ],
+              "is_optimal": true
+            },
+            "chlorophyll_analysis": {
+              "value_mg_m3": 0.95,
+              "status": "OPTIMAL",
+              "optimal_range": [
+                0.2,
+                3.0
+              ],
+              "is_optimal": true
+            },
+            "thermal_front": {
+              "calculation_available": false,
+              "gradient_c_per_km": null,
+              "front_detected": false,
+              "analysis_note": "Insufficient spatial grid data; horizontal SST gradient calculation unavailable without local grid observations."
+            },
+            "pfz_rank": 3,
+            "is_recommended": false
+          },
+          {
+            "id": "PFZ-MNG-04",
+            "lat": 12.92,
+            "lon": 74.68,
+            "bearing_deg": 287,
+            "distance_km": 18.2,
+            "depth_m": 28,
+            "sst_c": 28.9,
+            "chlorophyll_mg_m3": 0.82,
+            "suitability_score": 0.74,
+            "target_species": [
+              "Anchovy",
+              "Croaker",
+              "Sole Fish"
+            ],
+            "feature": "Nearshore thermal convergence plume",
+            "fish_density_index": 5.7,
+            "bulletin_id": "INCOIS-PFZ-MANGALORE-2026",
+            "sector": "Mangalore",
+            "state": "Karnataka",
+            "sector_match_distance_km": 0.0,
+            "generated_at": "2026-09-13T17:08:00.994224+00:00",
+            "valid_until": "2026-09-15T17:08:00.994224+00:00",
+            "source_distance_km": 18.5,
+            "source_bearing_deg": 280,
+            "distance_user_km": 18.2,
+            "bearing_user_deg": 287,
+            "calculated_distance_km": 18.2,
+            "calculated_bearing_deg": 287,
+            "is_simulated": true,
+            "evaluated_suitability": 1.0,
+            "sst_analysis": {
+              "value_c": 28.9,
+              "status": "OPTIMAL",
+              "optimal_range": [
+                26.5,
+                30.5
+              ],
+              "is_optimal": true
+            },
+            "chlorophyll_analysis": {
+              "value_mg_m3": 0.82,
+              "status": "OPTIMAL",
+              "optimal_range": [
+                0.2,
+                3.0
+              ],
+              "is_optimal": true
+            },
+            "thermal_front": {
+              "calculation_available": false,
+              "gradient_c_per_km": null,
+              "front_detected": false,
+              "analysis_note": "Insufficient spatial grid data; horizontal SST gradient calculation unavailable without local grid observations."
+            },
+            "pfz_rank": 4,
+            "is_recommended": false
+          }
+        ],
+        "pfz_candidates": [
+          {
+            "id": "PFZ-MNG-01",
+            "lat": 12.85,
+            "lon": 74.55,
+            "bearing_deg": 265,
+            "distance_km": 31.5,
+            "depth_m": 45,
+            "sst_c": 28.2,
+            "chlorophyll_mg_m3": 1.45,
+            "suitability_score": 0.91,
+            "target_species": [
+              "Indian Mackerel",
+              "Oil Sardine",
+              "Seer Fish"
+            ],
+            "feature": "Strong SST front with high chlorophyll boundary",
+            "fish_density_index": 8.5,
+            "bulletin_id": "INCOIS-PFZ-MANGALORE-2026",
+            "sector": "Mangalore",
+            "state": "Karnataka",
+            "sector_match_distance_km": 0.0,
+            "generated_at": "2026-09-13T17:08:00.994224+00:00",
+            "valid_until": "2026-09-15T17:08:00.994224+00:00",
+            "source_distance_km": 31.5,
+            "source_bearing_deg": 265,
+            "distance_user_km": 31.5,
+            "bearing_user_deg": 265,
+            "calculated_distance_km": 31.5,
+            "calculated_bearing_deg": 265,
+            "is_simulated": true,
+            "evaluated_suitability": 1.0,
+            "sst_analysis": {
+              "value_c": 28.2,
+              "status": "OPTIMAL",
+              "optimal_range": [
+                26.5,
+                30.5
+              ],
+              "is_optimal": true
+            },
+            "chlorophyll_analysis": {
+              "value_mg_m3": 1.45,
+              "status": "OPTIMAL",
+              "optimal_range": [
+                0.2,
+                3.0
+              ],
+              "is_optimal": true
+            },
+            "thermal_front": {
+              "calculation_available": false,
+              "gradient_c_per_km": null,
+              "front_detected": false,
+              "analysis_note": "Insufficient spatial grid data; horizontal SST gradient calculation unavailable without local grid observations."
+            },
+            "pfz_rank": 1,
+            "is_recommended": true
+          },
+          {
+            "id": "PFZ-MNG-03",
+            "lat": 12.68,
+            "lon": 74.45,
+            "bearing_deg": 243,
+            "distance_km": 47.3,
+            "depth_m": 65,
+            "sst_c": 27.9,
+            "chlorophyll_mg_m3": 1.65,
+            "suitability_score": 0.88,
+            "target_species": [
+              "Yellowfin Tuna",
+              "Ribbonfish",
+              "Pomfret"
+            ],
+            "feature": "Outer shelf upwelling zone with cyclonic eddy boundary",
+            "fish_density_index": 7.4,
+            "bulletin_id": "INCOIS-PFZ-MANGALORE-2026",
+            "sector": "Mangalore",
+            "state": "Karnataka",
+            "sector_match_distance_km": 0.0,
+            "generated_at": "2026-09-13T17:08:00.994224+00:00",
+            "valid_until": "2026-09-15T17:08:00.994224+00:00",
+            "source_distance_km": 46.5,
+            "source_bearing_deg": 240,
+            "distance_user_km": 47.3,
+            "bearing_user_deg": 243,
+            "calculated_distance_km": 47.3,
+            "calculated_bearing_deg": 243,
+            "is_simulated": true,
+            "evaluated_suitability": 1.0,
+            "sst_analysis": {
+              "value_c": 27.9,
+              "status": "OPTIMAL",
+              "optimal_range": [
+                26.5,
+                30.5
+              ],
+              "is_optimal": true
+            },
+            "chlorophyll_analysis": {
+              "value_mg_m3": 1.65,
+              "status": "OPTIMAL",
+              "optimal_range": [
+                0.2,
+                3.0
+              ],
+              "is_optimal": true
+            },
+            "thermal_front": {
+              "calculation_available": false,
+              "gradient_c_per_km": null,
+              "front_detected": false,
+              "analysis_note": "Insufficient spatial grid data; horizontal SST gradient calculation unavailable without local grid observations."
+            },
+            "pfz_rank": 2,
+            "is_recommended": false
+          },
+          {
+            "id": "PFZ-MNG-02",
+            "lat": 13.05,
+            "lon": 74.62,
+            "bearing_deg": 310,
+            "distance_km": 31.1,
+            "depth_m": 38,
+            "sst_c": 28.6,
+            "chlorophyll_mg_m3": 0.95,
+            "suitability_score": 0.79,
+            "target_species": [
+              "Sardines",
+              "Squid"
+            ],
+            "feature": "Moderate thermal gradient",
+            "fish_density_index": 6.2,
+            "bulletin_id": "INCOIS-PFZ-MANGALORE-2026",
+            "sector": "Mangalore",
+            "state": "Karnataka",
+            "sector_match_distance_km": 0.0,
+            "generated_at": "2026-09-13T17:08:00.994224+00:00",
+            "valid_until": "2026-09-15T17:08:00.994224+00:00",
+            "source_distance_km": 28.0,
+            "source_bearing_deg": 310,
+            "distance_user_km": 31.1,
+            "bearing_user_deg": 310,
+            "calculated_distance_km": 31.1,
+            "calculated_bearing_deg": 310,
+            "is_simulated": true,
+            "evaluated_suitability": 1.0,
+            "sst_analysis": {
+              "value_c": 28.6,
+              "status": "OPTIMAL",
+              "optimal_range": [
+                26.5,
+                30.5
+              ],
+              "is_optimal": true
+            },
+            "chlorophyll_analysis": {
+              "value_mg_m3": 0.95,
+              "status": "OPTIMAL",
+              "optimal_range": [
+                0.2,
+                3.0
+              ],
+              "is_optimal": true
+            },
+            "thermal_front": {
+              "calculation_available": false,
+              "gradient_c_per_km": null,
+              "front_detected": false,
+              "analysis_note": "Insufficient spatial grid data; horizontal SST gradient calculation unavailable without local grid observations."
+            },
+            "pfz_rank": 3,
+            "is_recommended": false
+          },
+          {
+            "id": "PFZ-MNG-04",
+            "lat": 12.92,
+            "lon": 74.68,
+            "bearing_deg": 287,
+            "distance_km": 18.2,
+            "depth_m": 28,
+            "sst_c": 28.9,
+            "chlorophyll_mg_m3": 0.82,
+            "suitability_score": 0.74,
+            "target_species": [
+              "Anchovy",
+              "Croaker",
+              "Sole Fish"
+            ],
+            "feature": "Nearshore thermal convergence plume",
+            "fish_density_index": 5.7,
+            "bulletin_id": "INCOIS-PFZ-MANGALORE-2026",
+            "sector": "Mangalore",
+            "state": "Karnataka",
+            "sector_match_distance_km": 0.0,
+            "generated_at": "2026-09-13T17:08:00.994224+00:00",
+            "valid_until": "2026-09-15T17:08:00.994224+00:00",
+            "source_distance_km": 18.5,
+            "source_bearing_deg": 280,
+            "distance_user_km": 18.2,
+            "bearing_user_deg": 287,
+            "calculated_distance_km": 18.2,
+            "calculated_bearing_deg": 287,
+            "is_simulated": true,
+            "evaluated_suitability": 1.0,
+            "sst_analysis": {
+              "value_c": 28.9,
+              "status": "OPTIMAL",
+              "optimal_range": [
+                26.5,
+                30.5
+              ],
+              "is_optimal": true
+            },
+            "chlorophyll_analysis": {
+              "value_mg_m3": 0.82,
+              "status": "OPTIMAL",
+              "optimal_range": [
+                0.2,
+                3.0
+              ],
+              "is_optimal": true
+            },
+            "thermal_front": {
+              "calculation_available": false,
+              "gradient_c_per_km": null,
+              "front_detected": false,
+              "analysis_note": "Insufficient spatial grid data; horizontal SST gradient calculation unavailable without local grid observations."
+            },
+            "pfz_rank": 4,
+            "is_recommended": false
+          }
+        ],
+        "total_candidates": 4,
+        "bulletins_count": 4,
+        "safety_subordinate": true,
+        "advisory_note": "PFZ suitability indicates fish aggregation potential only. Navigation safety is strictly subordinate to Weather and Geospatial hard constraints.",
+        "is_simulated": true,
+        "data_source": "INCOIS PFZ Mission Bulletin (Simulated/Mock)",
+        "ocean_features": "Strong SST front with high chlorophyll boundary",
+        "target_species": [
+          "Indian Mackerel",
+          "Oil Sardine",
+          "Seer Fish"
+        ]
+      },
+      "confidence": 0.92,
+      "sources": [
+        {
+          "name": "INCOIS PFZ Mission Bulletin (Simulated)",
+          "timestamp": "2026-09-13T17:08:00.994224+00:00",
+          "is_simulated": true
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "agent": "GeospatialReasoningAgent",
+      "status": "success",
+      "location": {
+        "lat": 12.87,
+        "lon": 74.84
+      },
+      "time_range": {
+        "start": "2026-09-13T17:08:00.994774+00:00",
+        "end": "2026-09-13T17:08:00.994774+00:00"
+      },
+      "result": {
+        "verdict": "SAFE",
+        "status_description": "Geospatial check clear: No restricted marine or naval zone conflicts detected.",
+        "coordinates_valid": true,
+        "geospatial_evaluation_available": true,
+        "is_inside_restricted": false,
+        "inside_restricted_zone": false,
+        "within_caution_perimeter": false,
+        "distance_to_boundary_km": 224.02,
+        "distance_to_nearest_restricted_km": 224.02,
+        "nearest_restricted_zone": "Karwar Naval Exclusion Perimeter (INS Kadamba / Project Seabird)",
+        "restricted_zone_breached": null,
+        "nearest_boundary_point": {
+          "lat": 14.78,
+          "lon": 74.18
+        },
+        "reasons": [
+          "Geospatial check clear: No restricted marine or naval zone conflicts detected."
+        ],
+        "candidates_with_distances": [
+          {
+            "id": "PFZ-MNG-01",
+            "lat": 12.85,
+            "lon": 74.55,
+            "bearing_deg": 265,
+            "distance_km": 31.5,
+            "depth_m": 45,
+            "sst_c": 28.2,
+            "chlorophyll_mg_m3": 1.45,
+            "suitability_score": 0.91,
+            "target_species": [
+              "Indian Mackerel",
+              "Oil Sardine",
+              "Seer Fish"
+            ],
+            "feature": "Strong SST front with high chlorophyll boundary",
+            "fish_density_index": 8.5,
+            "bulletin_id": "INCOIS-PFZ-MANGALORE-2026",
+            "sector": "Mangalore",
+            "state": "Karnataka",
+            "sector_match_distance_km": 0.0,
+            "generated_at": "2026-09-13T17:08:00.994224+00:00",
+            "valid_until": "2026-09-15T17:08:00.994224+00:00",
+            "source_distance_km": 31.5,
+            "source_bearing_deg": 265,
+            "distance_user_km": 31.5,
+            "bearing_user_deg": 265,
+            "calculated_distance_km": 31.52,
+            "calculated_bearing_deg": 265,
+            "is_simulated": true,
+            "is_in_restricted_zone": false
+          },
+          {
+            "id": "PFZ-MNG-03",
+            "lat": 12.68,
+            "lon": 74.45,
+            "bearing_deg": 243,
+            "distance_km": 47.3,
+            "depth_m": 65,
+            "sst_c": 27.9,
+            "chlorophyll_mg_m3": 1.65,
+            "suitability_score": 0.88,
+            "target_species": [
+              "Yellowfin Tuna",
+              "Ribbonfish",
+              "Pomfret"
+            ],
+            "feature": "Outer shelf upwelling zone with cyclonic eddy boundary",
+            "fish_density_index": 7.4,
+            "bulletin_id": "INCOIS-PFZ-MANGALORE-2026",
+            "sector": "Mangalore",
+            "state": "Karnataka",
+            "sector_match_distance_km": 0.0,
+            "generated_at": "2026-09-13T17:08:00.994224+00:00",
+            "valid_until": "2026-09-15T17:08:00.994224+00:00",
+            "source_distance_km": 46.5,
+            "source_bearing_deg": 240,
+            "distance_user_km": 47.3,
+            "bearing_user_deg": 243,
+            "calculated_distance_km": 47.28,
+            "calculated_bearing_deg": 243,
+            "is_simulated": true,
+            "is_in_restricted_zone": false
+          },
+          {
+            "id": "PFZ-MNG-02",
+            "lat": 13.05,
+            "lon": 74.62,
+            "bearing_deg": 310,
+            "distance_km": 31.1,
+            "depth_m": 38,
+            "sst_c": 28.6,
+            "chlorophyll_mg_m3": 0.95,
+            "suitability_score": 0.79,
+            "target_species": [
+              "Sardines",
+              "Squid"
+            ],
+            "feature": "Moderate thermal gradient",
+            "fish_density_index": 6.2,
+            "bulletin_id": "INCOIS-PFZ-MANGALORE-2026",
+            "sector": "Mangalore",
+            "state": "Karnataka",
+            "sector_match_distance_km": 0.0,
+            "generated_at": "2026-09-13T17:08:00.994224+00:00",
+            "valid_until": "2026-09-15T17:08:00.994224+00:00",
+            "source_distance_km": 28.0,
+            "source_bearing_deg": 310,
+            "distance_user_km": 31.1,
+            "bearing_user_deg": 310,
+            "calculated_distance_km": 31.13,
+            "calculated_bearing_deg": 310,
+            "is_simulated": true,
+            "is_in_restricted_zone": false
+          },
+          {
+            "id": "PFZ-MNG-04",
+            "lat": 12.92,
+            "lon": 74.68,
+            "bearing_deg": 287,
+            "distance_km": 18.2,
+            "depth_m": 28,
+            "sst_c": 28.9,
+            "chlorophyll_mg_m3": 0.82,
+            "suitability_score": 0.74,
+            "target_species": [
+              "Anchovy",
+              "Croaker",
+              "Sole Fish"
+            ],
+            "feature": "Nearshore thermal convergence plume",
+            "fish_density_index": 5.7,
+            "bulletin_id": "INCOIS-PFZ-MANGALORE-2026",
+            "sector": "Mangalore",
+            "state": "Karnataka",
+            "sector_match_distance_km": 0.0,
+            "generated_at": "2026-09-13T17:08:00.994224+00:00",
+            "valid_until": "2026-09-15T17:08:00.994224+00:00",
+            "source_distance_km": 18.5,
+            "source_bearing_deg": 280,
+            "distance_user_km": 18.2,
+            "bearing_user_deg": 287,
+            "calculated_distance_km": 18.21,
+            "calculated_bearing_deg": 287,
+            "is_simulated": true,
+            "is_in_restricted_zone": false
+          }
+        ],
+        "candidates": [
+          {
+            "id": "PFZ-MNG-01",
+            "lat": 12.85,
+            "lon": 74.55,
+            "bearing_deg": 265,
+            "distance_km": 31.5,
+            "depth_m": 45,
+            "sst_c": 28.2,
+            "chlorophyll_mg_m3": 1.45,
+            "suitability_score": 0.91,
+            "target_species": [
+              "Indian Mackerel",
+              "Oil Sardine",
+              "Seer Fish"
+            ],
+            "feature": "Strong SST front with high chlorophyll boundary",
+            "fish_density_index": 8.5,
+            "bulletin_id": "INCOIS-PFZ-MANGALORE-2026",
+            "sector": "Mangalore",
+            "state": "Karnataka",
+            "sector_match_distance_km": 0.0,
+            "generated_at": "2026-09-13T17:08:00.994224+00:00",
+            "valid_until": "2026-09-15T17:08:00.994224+00:00",
+            "source_distance_km": 31.5,
+            "source_bearing_deg": 265,
+            "distance_user_km": 31.5,
+            "bearing_user_deg": 265,
+            "calculated_distance_km": 31.52,
+            "calculated_bearing_deg": 265,
+            "is_simulated": true,
+            "is_in_restricted_zone": false
+          },
+          {
+            "id": "PFZ-MNG-03",
+            "lat": 12.68,
+            "lon": 74.45,
+            "bearing_deg": 243,
+            "distance_km": 47.3,
+            "depth_m": 65,
+            "sst_c": 27.9,
+            "chlorophyll_mg_m3": 1.65,
+            "suitability_score": 0.88,
+            "target_species": [
+              "Yellowfin Tuna",
+              "Ribbonfish",
+              "Pomfret"
+            ],
+            "feature": "Outer shelf upwelling zone with cyclonic eddy boundary",
+            "fish_density_index": 7.4,
+            "bulletin_id": "INCOIS-PFZ-MANGALORE-2026",
+            "sector": "Mangalore",
+            "state": "Karnataka",
+            "sector_match_distance_km": 0.0,
+            "generated_at": "2026-09-13T17:08:00.994224+00:00",
+            "valid_until": "2026-09-15T17:08:00.994224+00:00",
+            "source_distance_km": 46.5,
+            "source_bearing_deg": 240,
+            "distance_user_km": 47.3,
+            "bearing_user_deg": 243,
+            "calculated_distance_km": 47.28,
+            "calculated_bearing_deg": 243,
+            "is_simulated": true,
+            "is_in_restricted_zone": false
+          },
+          {
+            "id": "PFZ-MNG-02",
+            "lat": 13.05,
+            "lon": 74.62,
+            "bearing_deg": 310,
+            "distance_km": 31.1,
+            "depth_m": 38,
+            "sst_c": 28.6,
+            "chlorophyll_mg_m3": 0.95,
+            "suitability_score": 0.79,
+            "target_species": [
+              "Sardines",
+              "Squid"
+            ],
+            "feature": "Moderate thermal gradient",
+            "fish_density_index": 6.2,
+            "bulletin_id": "INCOIS-PFZ-MANGALORE-2026",
+            "sector": "Mangalore",
+            "state": "Karnataka",
+            "sector_match_distance_km": 0.0,
+            "generated_at": "2026-09-13T17:08:00.994224+00:00",
+            "valid_until": "2026-09-15T17:08:00.994224+00:00",
+            "source_distance_km": 28.0,
+            "source_bearing_deg": 310,
+            "distance_user_km": 31.1,
+            "bearing_user_deg": 310,
+            "calculated_distance_km": 31.13,
+            "calculated_bearing_deg": 310,
+            "is_simulated": true,
+            "is_in_restricted_zone": false
+          },
+          {
+            "id": "PFZ-MNG-04",
+            "lat": 12.92,
+            "lon": 74.68,
+            "bearing_deg": 287,
+            "distance_km": 18.2,
+            "depth_m": 28,
+            "sst_c": 28.9,
+            "chlorophyll_mg_m3": 0.82,
+            "suitability_score": 0.74,
+            "target_species": [
+              "Anchovy",
+              "Croaker",
+              "Sole Fish"
+            ],
+            "feature": "Nearshore thermal convergence plume",
+            "fish_density_index": 5.7,
+            "bulletin_id": "INCOIS-PFZ-MANGALORE-2026",
+            "sector": "Mangalore",
+            "state": "Karnataka",
+            "sector_match_distance_km": 0.0,
+            "generated_at": "2026-09-13T17:08:00.994224+00:00",
+            "valid_until": "2026-09-15T17:08:00.994224+00:00",
+            "source_distance_km": 18.5,
+            "source_bearing_deg": 280,
+            "distance_user_km": 18.2,
+            "bearing_user_deg": 287,
+            "calculated_distance_km": 18.21,
+            "calculated_bearing_deg": 287,
+            "is_simulated": true,
+            "is_in_restricted_zone": false
+          }
+        ],
+        "pfz_candidates": [
+          {
+            "id": "PFZ-MNG-01",
+            "lat": 12.85,
+            "lon": 74.55,
+            "bearing_deg": 265,
+            "distance_km": 31.5,
+            "depth_m": 45,
+            "sst_c": 28.2,
+            "chlorophyll_mg_m3": 1.45,
+            "suitability_score": 0.91,
+            "target_species": [
+              "Indian Mackerel",
+              "Oil Sardine",
+              "Seer Fish"
+            ],
+            "feature": "Strong SST front with high chlorophyll boundary",
+            "fish_density_index": 8.5,
+            "bulletin_id": "INCOIS-PFZ-MANGALORE-2026",
+            "sector": "Mangalore",
+            "state": "Karnataka",
+            "sector_match_distance_km": 0.0,
+            "generated_at": "2026-09-13T17:08:00.994224+00:00",
+            "valid_until": "2026-09-15T17:08:00.994224+00:00",
+            "source_distance_km": 31.5,
+            "source_bearing_deg": 265,
+            "distance_user_km": 31.5,
+            "bearing_user_deg": 265,
+            "calculated_distance_km": 31.52,
+            "calculated_bearing_deg": 265,
+            "is_simulated": true,
+            "is_in_restricted_zone": false
+          },
+          {
+            "id": "PFZ-MNG-03",
+            "lat": 12.68,
+            "lon": 74.45,
+            "bearing_deg": 243,
+            "distance_km": 47.3,
+            "depth_m": 65,
+            "sst_c": 27.9,
+            "chlorophyll_mg_m3": 1.65,
+            "suitability_score": 0.88,
+            "target_species": [
+              "Yellowfin Tuna",
+              "Ribbonfish",
+              "Pomfret"
+            ],
+            "feature": "Outer shelf upwelling zone with cyclonic eddy boundary",
+            "fish_density_index": 7.4,
+            "bulletin_id": "INCOIS-PFZ-MANGALORE-2026",
+            "sector": "Mangalore",
+            "state": "Karnataka",
+            "sector_match_distance_km": 0.0,
+            "generated_at": "2026-09-13T17:08:00.994224+00:00",
+            "valid_until": "2026-09-15T17:08:00.994224+00:00",
+            "source_distance_km": 46.5,
+            "source_bearing_deg": 240,
+            "distance_user_km": 47.3,
+            "bearing_user_deg": 243,
+            "calculated_distance_km": 47.28,
+            "calculated_bearing_deg": 243,
+            "is_simulated": true,
+            "is_in_restricted_zone": false
+          },
+          {
+            "id": "PFZ-MNG-02",
+            "lat": 13.05,
+            "lon": 74.62,
+            "bearing_deg": 310,
+            "distance_km": 31.1,
+            "depth_m": 38,
+            "sst_c": 28.6,
+            "chlorophyll_mg_m3": 0.95,
+            "suitability_score": 0.79,
+            "target_species": [
+              "Sardines",
+              "Squid"
+            ],
+            "feature": "Moderate thermal gradient",
+            "fish_density_index": 6.2,
+            "bulletin_id": "INCOIS-PFZ-MANGALORE-2026",
+            "sector": "Mangalore",
+            "state": "Karnataka",
+            "sector_match_distance_km": 0.0,
+            "generated_at": "2026-09-13T17:08:00.994224+00:00",
+            "valid_until": "2026-09-15T17:08:00.994224+00:00",
+            "source_distance_km": 28.0,
+            "source_bearing_deg": 310,
+            "distance_user_km": 31.1,
+            "bearing_user_deg": 310,
+            "calculated_distance_km": 31.13,
+            "calculated_bearing_deg": 310,
+            "is_simulated": true,
+            "is_in_restricted_zone": false
+          },
+          {
+            "id": "PFZ-MNG-04",
+            "lat": 12.92,
+            "lon": 74.68,
+            "bearing_deg": 287,
+            "distance_km": 18.2,
+            "depth_m": 28,
+            "sst_c": 28.9,
+            "chlorophyll_mg_m3": 0.82,
+            "suitability_score": 0.74,
+            "target_species": [
+              "Anchovy",
+              "Croaker",
+              "Sole Fish"
+            ],
+            "feature": "Nearshore thermal convergence plume",
+            "fish_density_index": 5.7,
+            "bulletin_id": "INCOIS-PFZ-MANGALORE-2026",
+            "sector": "Mangalore",
+            "state": "Karnataka",
+            "sector_match_distance_km": 0.0,
+            "generated_at": "2026-09-13T17:08:00.994224+00:00",
+            "valid_until": "2026-09-15T17:08:00.994224+00:00",
+            "source_distance_km": 18.5,
+            "source_bearing_deg": 280,
+            "distance_user_km": 18.2,
+            "bearing_user_deg": 287,
+            "calculated_distance_km": 18.21,
+            "calculated_bearing_deg": 287,
+            "is_simulated": true,
+            "is_in_restricted_zone": false
+          }
+        ],
+        "user_coordinates": {
+          "lat": 12.87,
+          "lon": 74.84
+        }
+      },
+      "confidence": 0.98,
+      "sources": [
+        {
+          "name": "Marine Sanctuary & Naval Exclusion Registry",
+          "timestamp": "2026-09-13T17:08:00.994774+00:00"
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "agent": "RiskAssessmentAgent",
+      "status": "success",
+      "location": {
+        "lat": 12.87,
+        "lon": 74.84
+      },
+      "time_range": {
+        "start": "2026-09-14T06:00:00+05:30",
+        "end": "2026-09-14T12:00:00+05:30",
+        "label": "Tomorrow Morning",
+        "is_current": false
+      },
+      "result": {
+        "verdict": "SAFE",
+        "risk_score": 0.15,
+        "primary_drivers": [
+          "NORMAL: Favorable weather conditions with wind speed at 14.3 km/h and wave height at 0.98 m.",
+          "Geospatial check clear: No restricted marine or naval zone conflicts detected."
+        ],
+        "actionable_directive": "NORMAL FISHING OPERATIONS AUTHORIZED. Favorable marine conditions.",
+        "weather_summary": {
+          "verdict": "SAFE",
+          "metrics": {
+            "wind_speed_kmh": 14.3,
+            "wave_height_m": 0.98,
+            "wind_gust_kmh": 36.7,
+            "has_storm_alert": false,
+            "weather_code": null,
+            "forecast_available": true
+          }
+        },
+        "geospatial_summary": {
+          "verdict": "SAFE",
+          "is_restricted": false
+        },
+        "ocean_summary": {
+          "verdict": "FAVORABLE",
+          "recommended_pfz_id": "PFZ-MNG-01"
+        }
+      },
+      "confidence": 0.99,
+      "sources": [
+        {
+          "name": "Deterministic Safety Hierarchy (safety_rules.py)",
+          "timestamp": "2026-09-13T17:08:00.995878+00:00"
+        },
+        {
+          "name": "Open-Meteo API",
+          "timestamp": "2026-09-13T17:08:00.993839+00:00"
+        },
+        {
+          "name": "Marine Sanctuary & Naval Exclusion Registry",
+          "timestamp": "2026-09-13T17:08:00.994774+00:00"
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "agent": "VisualizationAgent",
+      "status": "success",
+      "location": {
+        "lat": 12.87,
+        "lon": 74.84
+      },
+      "time_range": {
+        "start": "2026-09-14T06:00:00+05:30",
+        "end": "2026-09-14T12:00:00+05:30",
+        "label": "Tomorrow Morning",
+        "is_current": false
+      },
+      "result": {
+        "geojson": {
+          "type": "FeatureCollection",
+          "features": [
+            {
+              "type": "Feature",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  74.84,
+                  12.87
+                ]
+              },
+              "properties": {
+                "id": "user-vessel",
+                "title": "Vessel / Port Location",
+                "category": "user",
+                "marker-color": "#2563eb",
+                "marker-symbol": "ferry"
+              }
+            },
+            {
+              "type": "Feature",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  74.55,
+                  12.85
+                ]
+              },
+              "properties": {
+                "id": "PFZ-MNG-01",
+                "title": "PFZ: PFZ-MNG-01",
+                "category": "pfz",
+                "pfz_rank": 1,
+                "is_recommended": true,
+                "marker-color": "#059669",
+                "marker-symbol": "star",
+                "lat": 12.85,
+                "lon": 74.55,
+                "sst_celsius": 28.2,
+                "chlorophyll_mg_m3": 1.45,
+                "suitability_score": 1.0,
+                "fish_density_index": 8.5,
+                "bearing_deg": 265,
+                "distance_km": 31.5,
+                "distance_user_km": 31.5,
+                "bearing_user_deg": 265,
+                "calculated_distance_km": 31.5,
+                "calculated_bearing_deg": 265,
+                "source_distance_km": 31.5,
+                "source_bearing_deg": 265,
+                "target_species": [
+                  "Indian Mackerel",
+                  "Oil Sardine",
+                  "Seer Fish"
+                ],
+                "is_in_restricted_zone": false,
+                "ocean_feature": "Strong SST front with high chlorophyll boundary",
+                "depth_m": 45
+              }
+            },
+            {
+              "type": "Feature",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  74.45,
+                  12.68
+                ]
+              },
+              "properties": {
+                "id": "PFZ-MNG-03",
+                "title": "PFZ #2: PFZ-MNG-03",
+                "category": "pfz",
+                "pfz_rank": 2,
+                "is_recommended": false,
+                "marker-color": "#0d9488",
+                "marker-symbol": "circle",
+                "lat": 12.68,
+                "lon": 74.45,
+                "sst_celsius": 27.9,
+                "chlorophyll_mg_m3": 1.65,
+                "suitability_score": 1.0,
+                "fish_density_index": 7.4,
+                "bearing_deg": 243,
+                "distance_km": 47.3,
+                "distance_user_km": 47.3,
+                "bearing_user_deg": 243,
+                "calculated_distance_km": 47.3,
+                "calculated_bearing_deg": 243,
+                "source_distance_km": 46.5,
+                "source_bearing_deg": 240,
+                "target_species": [
+                  "Yellowfin Tuna",
+                  "Ribbonfish",
+                  "Pomfret"
+                ],
+                "is_in_restricted_zone": false,
+                "ocean_feature": "Outer shelf upwelling zone with cyclonic eddy boundary",
+                "depth_m": 65
+              }
+            },
+            {
+              "type": "Feature",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  74.62,
+                  13.05
+                ]
+              },
+              "properties": {
+                "id": "PFZ-MNG-02",
+                "title": "PFZ #3: PFZ-MNG-02",
+                "category": "pfz",
+                "pfz_rank": 3,
+                "is_recommended": false,
+                "marker-color": "#0d9488",
+                "marker-symbol": "circle",
+                "lat": 13.05,
+                "lon": 74.62,
+                "sst_celsius": 28.6,
+                "chlorophyll_mg_m3": 0.95,
+                "suitability_score": 1.0,
+                "fish_density_index": 6.2,
+                "bearing_deg": 310,
+                "distance_km": 31.1,
+                "distance_user_km": 31.1,
+                "bearing_user_deg": 310,
+                "calculated_distance_km": 31.1,
+                "calculated_bearing_deg": 310,
+                "source_distance_km": 28.0,
+                "source_bearing_deg": 310,
+                "target_species": [
+                  "Sardines",
+                  "Squid"
+                ],
+                "is_in_restricted_zone": false,
+                "ocean_feature": "Moderate thermal gradient",
+                "depth_m": 38
+              }
+            },
+            {
+              "type": "Feature",
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  74.68,
+                  12.92
+                ]
+              },
+              "properties": {
+                "id": "PFZ-MNG-04",
+                "title": "PFZ #4: PFZ-MNG-04",
+                "category": "pfz",
+                "pfz_rank": 4,
+                "is_recommended": false,
+                "marker-color": "#0d9488",
+                "marker-symbol": "circle",
+                "lat": 12.92,
+                "lon": 74.68,
+                "sst_celsius": 28.9,
+                "chlorophyll_mg_m3": 0.82,
+                "suitability_score": 1.0,
+                "fish_density_index": 5.7,
+                "bearing_deg": 287,
+                "distance_km": 18.2,
+                "distance_user_km": 18.2,
+                "bearing_user_deg": 287,
+                "calculated_distance_km": 18.2,
+                "calculated_bearing_deg": 287,
+                "source_distance_km": 18.5,
+                "source_bearing_deg": 280,
+                "target_species": [
+                  "Anchovy",
+                  "Croaker",
+                  "Sole Fish"
+                ],
+                "is_in_restricted_zone": false,
+                "ocean_feature": "Nearshore thermal convergence plume",
+                "depth_m": 28
+              }
+            },
+            {
+              "type": "Feature",
+              "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                  [
+                    74.84,
+                    12.87
+                  ],
+                  [
+                    74.55,
+                    12.85
+                  ]
+                ]
+              },
+              "properties": {
+                "id": "nav-course-vector",
+                "title": "Course Vector (31.5 km @ 265°)",
+                "stroke": "#0284c7",
+                "stroke-width": 2.5,
+                "stroke-dasharray": "5, 5",
+                "distance_km": 31.5,
+                "bearing_deg": 265,
+                "target_pfz_id": "PFZ-MNG-01"
+              }
+            },
+            {
+              "type": "Feature",
+              "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [
+                      74.08,
+                      14.78
+                    ],
+                    [
+                      74.18,
+                      14.78
+                    ],
+                    [
+                      74.18,
+                      14.86
+                    ],
+                    [
+                      74.08,
+                      14.86
+                    ],
+                    [
+                      74.08,
+                      14.78
+                    ]
+                  ]
+                ]
+              },
+              "properties": {
+                "id": "restricted-Karwar Nav",
+                "title": "Karwar Naval Exclusion Perimeter (INS Kadamba / Project Seabird)",
+                "category": "restricted_zone",
+                "zone_type": "Naval Security Exclusion Zone",
+                "fill": "#dc2626",
+                "fill-opacity": 0.25,
+                "stroke": "#b91c1c",
+                "stroke-width": 2
+              }
+            },
+            {
+              "type": "Feature",
+              "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [
+                      79.0,
+                      9.1
+                    ],
+                    [
+                      79.35,
+                      9.1
+                    ],
+                    [
+                      79.35,
+                      9.3
+                    ],
+                    [
+                      79.0,
+                      9.3
+                    ],
+                    [
+                      79.0,
+                      9.1
+                    ]
+                  ]
+                ]
+              },
+              "properties": {
+                "id": "restricted-Gulf of Ma",
+                "title": "Gulf of Mannar Marine National Park",
+                "category": "restricted_zone",
+                "zone_type": "Marine Biosphere Reserve / National Park",
+                "fill": "#dc2626",
+                "fill-opacity": 0.25,
+                "stroke": "#b91c1c",
+                "stroke-width": 2
+              }
+            },
+            {
+              "type": "Feature",
+              "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [
+                      86.75,
+                      20.6
+                    ],
+                    [
+                      87.15,
+                      20.6
+                    ],
+                    [
+                      87.15,
+                      20.9
+                    ],
+                    [
+                      86.75,
+                      20.9
+                    ],
+                    [
+                      86.75,
+                      20.6
+                    ]
+                  ]
+                ]
+              },
+              "properties": {
+                "id": "restricted-Gahirmatha",
+                "title": "Gahirmatha Marine Sanctuary (Olive Ridley Nesting Zone)",
+                "category": "restricted_zone",
+                "zone_type": "Marine Sanctuary",
+                "fill": "#dc2626",
+                "fill-opacity": 0.25,
+                "stroke": "#b91c1c",
+                "stroke-width": 2
+              }
+            },
+            {
+              "type": "Feature",
+              "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [
+                      71.85,
+                      19.3
+                    ],
+                    [
+                      72.15,
+                      19.3
+                    ],
+                    [
+                      72.15,
+                      19.65
+                    ],
+                    [
+                      71.85,
+                      19.65
+                    ],
+                    [
+                      71.85,
+                      19.3
+                    ]
+                  ]
+                ]
+              },
+              "properties": {
+                "id": "restricted-Mumbai Off",
+                "title": "Mumbai Offshore High Security Zone (Bombay High)",
+                "category": "restricted_zone",
+                "zone_type": "Critical Infrastructure Exclusion Perimeter",
+                "fill": "#dc2626",
+                "fill-opacity": 0.25,
+                "stroke": "#b91c1c",
+                "stroke-width": 2
+              }
+            }
+          ]
+        },
+        "charts": {
+          "available": true,
+          "labels": [
+            "06:00",
+            "07:00",
+            "08:00",
+            "09:00",
+            "10:00",
+            "11:00",
+            "12:00"
+          ],
+          "timestamps": [
+            "2026-09-14T06:00",
+            "2026-09-14T07:00",
+            "2026-09-14T08:00",
+            "2026-09-14T09:00",
+            "2026-09-14T10:00",
+            "2026-09-14T11:00",
+            "2026-09-14T12:00"
+          ],
+          "source": {
+            "name": "Open-Meteo API",
+            "is_simulated": false
+          },
+          "wave_series": {
+            "name": "Significant Wave Height (m)",
+            "unit": "m",
+            "data": [
+              0.98,
+              0.98,
+              0.98,
+              0.98,
+              0.98,
+              0.98,
+              0.98
+            ],
+            "caution_threshold": 2.0,
+            "danger_threshold": 3.5
+          },
+          "wind_series": {
+            "name": "Wind Speed (km/h)",
+            "unit": "km/h",
+            "data": [
+              6.3,
+              5.1,
+              4.8,
+              7.9,
+              10.3,
+              12.2,
+              14.3
+            ],
+            "caution_threshold": 35.0,
+            "danger_threshold": 50.0
+          },
+          "gust_series": {
+            "name": "Wind Gusts (km/h)",
+            "unit": "km/h",
+            "data": [
+              12.2,
+              13.3,
+              16.2,
+              23.0,
+              28.4,
+              32.4,
+              36.7
+            ],
+            "caution_threshold": 55.0,
+            "danger_threshold": 70.0
+          },
+          "temperature_series": {
+            "name": "Air Temperature (°C)",
+            "unit": "°C",
+            "data": [
+              24.1,
+              25.6,
+              27.8,
+              29.5,
+              30.6,
+              30.6,
+              30.6
+            ]
+          },
+          "precipitation_series": {
+            "name": "Precipitation (mm)",
+            "unit": "mm",
+            "data": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        },
+        "map_bounds": [
+          74.2,
+          12.43,
+          75.09,
+          13.3
+        ],
+        "total_layers": 10
+      },
+      "confidence": 1.0,
+      "sources": [
+        {
+          "name": "ORCA GeoJSON & Telemetry Rendering Engine",
+          "timestamp": "2026-09-13T17:08:00.995983+00:00"
+        }
+      ],
+      "warnings": []
+    },
+    {
+      "agent": "ReportingAgent",
+      "status": "success",
+      "location": {
+        "lat": 12.87,
+        "lon": 74.84
+      },
+      "time_range": {
+        "start": "2026-09-14T06:00:00+05:30",
+        "end": "2026-09-14T12:00:00+05:30",
+        "label": "Tomorrow Morning",
+        "is_current": false
+      },
+      "result": {
+        "verdict": "SAFE",
+        "safety_summary": "[Tomorrow Morning] Status: SAFE | Wind: 14.3 km/h | Wave: 0.98 m | PFZ: 31.5km offshore",
+        "report_english": "**SAFETY ADVISORY: SAFE FOR OPERATIONS - FAVORABLE CONDITIONS NEAR MANGALORE [SAFE]**\n\n**Forecast Period:** Tomorrow Morning\n\nSea conditions are safe for coastal and deep-sea fishing. Recorded wind: 14.3 km/h (gusts: 36.7 km/h), significant wave height: 0.98 m, precipitation: 0 mm. Potential Fishing Zone (PFZ: FAVORABLE): PFZ-MNG-01 located 31.5 km offshore (bearing 265°), Sea Surface Temp 28.2°C with high chlorophyll-a. Target catch: Indian Mackerel, Oil Sardine. Geospatial check clear: No restricted marine or naval zone conflicts detected. Weather forecast indicates stable conditions.",
+        "temporal_window": "Tomorrow Morning",
+        "evidence_cited": {
+          "wind_speed_kmh": 14.3,
+          "wave_height_m": 0.98,
+          "drivers": [
+            "NORMAL: Favorable weather conditions with wind speed at 14.3 km/h and wave height at 0.98 m.",
+            "Geospatial check clear: No restricted marine or naval zone conflicts detected."
+          ],
+          "nearest_pfz": "PFZ-MNG-01"
+        }
+      },
+      "confidence": 0.96,
+      "sources": [
+        {
+          "name": "Anthropic Claude (ORCA Reporting Agent)",
+          "timestamp": "2026-09-13T17:08:00.996544+00:00"
+        }
+      ],
+      "warnings": []
+    }
+  ],
+  "time_range": {
+    "start": "2026-09-14T06:00:00+05:30",
+    "end": "2026-09-14T12:00:00+05:30",
+    "label": "Tomorrow Morning",
+    "is_current": false
+  },
+  "translation_status": "original"
+}

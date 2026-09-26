@@ -1,0 +1,107 @@
+@import "tailwindcss";
+@import "@arcgis/core/assets/esri/themes/dark/main.css";
+
+@layer base {
+  :root {
+    --color-ocean-darkest: #03141F;
+    --color-ocean-darker: #061F2C;
+    --color-ocean-dark: #082A36;
+    --color-ocean-cyan: #16C7C7;
+    --color-ocean-bright: #28D7E5;
+    --color-status-safe: #36D399;
+    --color-status-warn: #F5B942;
+    --color-status-crit: #FF4D5A;
+    --color-agent-purple: #8B6CFF;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: #03141F;
+    color: #F1F5F9;
+  }
+
+  h1, h2, h3, h4, .font-heading {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+  }
+
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #03141F;
+}
+::-webkit-scrollbar-thumb {
+  background: #082A36;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #16C7C7;
+}
+
+/* Glassmorphism utility */
+.ocean-glass {
+  background: rgba(6, 31, 44, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(22, 199, 199, 0.18);
+}
+
+.ocean-glass-subtle {
+  background: rgba(3, 20, 31, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ocean-card {
+  background: linear-gradient(135deg, rgba(8, 42, 54, 0.6) 0%, rgba(6, 31, 44, 0.8) 100%);
+  border: 1px solid rgba(22, 199, 199, 0.15);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+/* Esri map container override for dark ocean integration */
+.esri-view {
+  background-color: #03141F !important;
+}
+
+.esri-view-surface {
+  outline: none !important;
+}
+
+.esri-ui .esri-component {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+  border: 1px solid rgba(22, 199, 199, 0.2) !important;
+}
+
+/* Marquee infinite scroll */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: marquee 35s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Pulse animation for live telemetry */
+@keyframes ocean-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.15); }
+}
+
+.animate-ocean-pulse {
+  animation: ocean-pulse 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

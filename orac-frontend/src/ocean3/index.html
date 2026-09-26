@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ORCA — Realistic Ocean Surface</title>
+  <meta name="description" content="Real-time ocean surface simulation built with Three.js and GLSL WebGL shaders.">
+
+  <!-- Three.js is loaded as ES modules from the official-compatible npm CDN build. -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div id="pfz-panel">
+    <div class="top-btn-row">
+      <button id="pfz-btn" class="pfz-toggle-btn" title="Potential Fishing Zones [P]">
+        <span class="pfz-icon-dot"></span>
+        PFZ
+        <span class="key-hint">[P]</span>
+      </button>
+      <button id="nav-start-btn" class="nav-toggle-btn start-btn" title="Start Autonomous Navigation [Space]">
+        ▶ START <span class="key-hint">[Space]</span>
+      </button>
+      <button id="nav-stop-btn" class="nav-toggle-btn stop-btn disabled" title="Stop Autonomous Navigation">
+        ⏹ STOP
+      </button>
+    </div>
+    <div id="pfz-legend" class="pfz-legend hidden">
+      <div class="legend-header">PFZ PRODUCTIVITY</div>
+      <div class="legend-row"><span class="legend-dot green"></span><span class="legend-lvl">HIGH</span><span class="legend-id">PFZ-1 (FAR)</span></div>
+      <div class="legend-row"><span class="legend-dot yellow"></span><span class="legend-lvl">MODERATE</span><span class="legend-id">PFZ-2 (MED)</span></div>
+      <div class="legend-row"><span class="legend-dot red"></span><span class="legend-lvl">LOW</span><span class="legend-id">PFZ-3 (NEAR)</span></div>
+    </div>
+  </div>
+  <div id="storm-warning" class="storm-warning hidden">
+    <div class="warning-icon">⚠️</div>
+    <div class="warning-content">
+      <div class="warning-title">DANGER · STORM CONDITIONS</div>
+      <div class="warning-msg" id="storm-warning-msg">AUTONOMOUS NAVIGATION DISABLED — VESSEL REMAINS SAFELY AT COAST</div>
+    </div>
+  </div>
+  <div id="overlay">ORCA · COASTAL OCEAN SIMULATOR</div>
+  <div id="fps"></div>
+  <div id="hud">
+    <div class="hud-item" id="speed-badge">SPEED: <span id="speed-val">0.0</span> KTS</div>
+    <div class="hud-item" id="zone-badge">ZONE: <span id="zone-val">OPEN SEA</span></div>
+    <div class="hud-item" id="nav-target-badge">TARGET: <span id="target-val">--</span></div>
+    <div class="hud-item" id="nav-status-badge">STATUS: <span id="status-val">IDLE</span></div>
+    <div class="hud-item" id="nav-dist-badge">DISTANCE: <span id="dist-val">--</span></div>
+    <div class="hud-item" id="comm-badge">COMM LINK: <span id="comm-val">STANDBY</span></div>
+    <div class="hud-item" id="cam-badge">CAMERA: <span id="cam-mode">FOLLOW</span> <span class="key-hint">[C]</span></div>
+    <div class="hud-item" id="depth-badge">DEPTH: <span id="depth-val">SURFACE</span> <span class="key-hint">[U]</span></div>
+    <div class="hud-item" id="weather-badge">WEATHER: <span id="weather-val">SUNNY</span></div>
+  </div>
+  <div id="weather-panel">
+    <button class="weather-btn active" data-weather="sunny">☀ SUNNY <span class="key-hint">[1]</span></button>
+    <button class="weather-btn" data-weather="cloudy">☁ CLOUDY <span class="key-hint">[2]</span></button>
+    <button class="weather-btn" data-weather="night">🌙 NIGHT <span class="key-hint">[3]</span></button>
+    <button class="weather-btn" data-weather="storm">⛈ STORM <span class="key-hint">[4]</span></button>
+  </div>
+  <div id="hint"><span class="key">Space</span> Start/Stop Nav · <span class="key">W</span> <span class="key">S</span> Throttle · <span class="key">A</span> <span class="key">D</span> Steer · <span class="key">P</span> PFZ · <span class="key">C</span> Camera · <span class="key">U</span> Dive/Surface · <span class="key">1-4</span> Weather</div>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

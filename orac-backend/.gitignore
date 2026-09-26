@@ -1,0 +1,21 @@
+# Python cache & artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local databases & logs
+orca.db
+orca.db-journal
+*.log
+
+# Environment secrets
+.env
+.env.local
+
+# IDE & editors
+.vscode/
+.idea/
+*.swp

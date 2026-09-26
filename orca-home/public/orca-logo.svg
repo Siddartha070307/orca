@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="orcaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#28D7E5" />
+      <stop offset="50%" stop-color="#16C7C7" />
+      <stop offset="100%" stop-color="#082A36" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#8B6CFF" />
+      <stop offset="100%" stop-color="#28D7E5" />
+    </linearGradient>
+  </defs>
+  <!-- Outer Ring with Geodesic ticks -->
+  <circle cx="32" cy="32" r="30" stroke="#16C7C7" stroke-width="1.5" stroke-dasharray="3 2" opacity="0.6"/>
+  <circle cx="32" cy="32" r="26" stroke="#28D7E5" stroke-width="0.75" opacity="0.4"/>
+  <!-- Central Dynamic Wave & Orca Fin Crest -->
+  <path d="M12 36C18 36 22 24 32 24C42 24 46 36 52 36C48 44 40 48 32 48C24 48 16 44 12 36Z" fill="url(#orcaGrad)" opacity="0.85"/>
+  <path d="M32 14C33.5 20 37 25 43 27C37 29 33.5 34 32 40C30.5 34 27 29 21 27C27 25 30.5 20 32 14Z" fill="url(#accentGrad)"/>
+  <circle cx="32" cy="27" r="2" fill="#FFFFFF"/>
+</svg>
