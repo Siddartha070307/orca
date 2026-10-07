@@ -9,6 +9,9 @@ htmlcov/
 # Local databases & logs
 orca.db
 orca.db-journal
+test_*.db
+*.db
+*.db-journal
 *.log
 
 # Environment secrets

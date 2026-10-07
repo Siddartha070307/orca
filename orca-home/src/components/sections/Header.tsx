@@ -9,10 +9,13 @@ import {
   RotateCcw,
   Globe,
   SlidersHorizontal,
-  ChevronDown
+  ChevronDown,
+  LogOut,
+  User as UserIcon
 } from 'lucide-react';
-import { useRole, UserRole } from '../../context/RoleContext';
+import { useAuth, UserRole } from '../../context/RoleContext';
 import { useI18n, SUPPORTED_LANGUAGES, LanguageCode } from '../../utils/i18n';
+import { WelcomeBanner } from '../auth/WelcomeBanner';
 
 interface HeaderProps {
   onOpenLayers?: () => void;
@@ -21,7 +24,7 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ onOpenLayers }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { role, switchRole } = useRole();
+  const { role, user, isAuthenticated, logout, switchRole } = useAuth();
   const { t, language, setLanguage } = useI18n();
 
   const handleLiveLayersClick = (e: React.MouseEvent) => {
@@ -182,21 +185,48 @@ export const Header: React.FC<HeaderProps> = ({ onOpenLayers }) => {
           </button>
         </nav>
 
-        {/* Right: Role Switcher + Language Selector + Telemetry Status */}
-        <div className="flex items-center space-x-2.5 sm:space-x-3">
-          {/* Switch Role Button */}
-          {role && (
+        {/* Right: User Pill + Logout / Switch + Language Selector + Telemetry Status */}
+        <div className="flex items-center space-x-2 sm:space-x-2.5">
+          {/* Authenticated User Pill */}
+          {isAuthenticated && user && (
+            <div className="hidden xl:flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-[#061F2C] border border-[#16C7C7]/30 text-xs">
+              <UserIcon className="w-3.5 h-3.5 text-[#28D7E5]" />
+              <span className="font-semibold text-white max-w-[120px] truncate">{user.full_name}</span>
+            </div>
+          )}
+
+          {/* Switch Role or Logout Button */}
+          {isAuthenticated ? (
+            <button
+              onClick={async () => {
+                await logout();
+                navigate('/');
+              }}
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-red-950/40 border border-red-500/40 text-red-300 hover:bg-red-900/60 hover:text-white transition-all text-xs font-mono font-medium shadow-sm cursor-pointer"
+              title="Logout from active session"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Logout</span>
+            </button>
+          ) : role ? (
             <button
               onClick={() => {
                 switchRole();
                 navigate('/');
               }}
               className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#082A36] border border-[#16C7C7]/40 text-[#28D7E5] hover:bg-[#16C7C7]/20 hover:border-[#28D7E5] transition-all text-xs font-mono font-medium shadow-sm cursor-pointer"
-              title="Change active profile (Fisherman / Authority / Researcher)"
+              title="Change active profile"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>{t('roles.switchRole', 'Switch Role')}</span>
             </button>
+          ) : (
+            <Link
+              to="/"
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#16C7C7] text-slate-950 font-bold hover:bg-[#28D7E5] transition-all text-xs font-mono shadow-sm cursor-pointer"
+            >
+              <span>Sign In</span>
+            </Link>
           )}
 
           {/* Language Selector */}
@@ -224,6 +254,9 @@ export const Header: React.FC<HeaderProps> = ({ onOpenLayers }) => {
           </div>
         </div>
       </div>
+
+      {/* Welcome Banner */}
+      <WelcomeBanner />
     </header>
   );
 };

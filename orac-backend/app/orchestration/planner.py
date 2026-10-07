@@ -5,6 +5,7 @@ Produces task plans and coordinates domain agents, checking result integrity
 before handing off to Risk Assessment, Visualization, and Reporting.
 """
 import logging
+import math
 import uuid
 from datetime import datetime, timezone
 from typing import Dict, Any, Optional
@@ -25,6 +26,20 @@ from app.agents.reporting import reporting_agent
 from app.dissemination.router import dissemination_router
 
 logger = logging.getLogger(__name__)
+
+# When a query names a place AND the request carries device/browser GPS coordinates,
+# a GPS fix within this distance of the named place refines it (the fix is more
+# precise). Beyond it, the explicitly named place wins over the distant GPS fix.
+GPS_REFINEMENT_DISTANCE_KM = 25.0
+
+
+def _haversine_km(a: Dict[str, float], b: Dict[str, float]) -> float:
+    """Great-circle distance in kilometres between two {lat, lon} dicts."""
+    lat1, lon1 = math.radians(a["lat"]), math.radians(a["lon"])
+    lat2, lon2 = math.radians(b["lat"]), math.radians(b["lon"])
+    dlat, dlon = lat2 - lat1, lon2 - lon1
+    h = math.sin(dlat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
+    return 2 * 6371.0 * math.asin(math.sqrt(h))
 
 
 class PlanningAgent:
@@ -63,22 +78,37 @@ class PlanningAgent:
         state.parsed_intent = parsed_plan
 
         # Location Resolution with Session Inheritance & Explicit Override
-        has_explicit_location = (
-            explicit_location is not None
-            or parsed_plan.get("has_explicit_location", False)
-            or bool(parsed_plan.get("location_name"))
-        )
-
         planning_warnings = []
-        if has_explicit_location and parsed_plan.get("location_name") and parsed_plan.get("coordinates") and parsed_plan.get("location_name") != "Specified Coordinates":
-            # 1. Explicit query location takes top priority over browser GPS and replaces prior session location
-            state.location_name = parsed_plan["location_name"]
-            state.location_coords = parsed_plan["coordinates"]
-        elif has_explicit_location and parsed_plan.get("location_name") and parsed_plan.get("location_name") != "Specified Coordinates":
-            # 2. Location specified in query but coordinates were not resolved
-            state.location_name = parsed_plan["location_name"]
-            state.location_coords = parsed_plan.get("coordinates")
-            if not state.location_coords:
+        parsed_name = parsed_plan.get("location_name")
+        parsed_coords = parsed_plan.get("coordinates")
+        is_named_place = bool(parsed_name) and parsed_name != "Specified Coordinates"
+
+        if is_named_place:
+            # 1. The query itself names a location: it drives the report label and
+            #    replaces any prior session location. Precise device/browser GPS
+            #    coordinates refine the named place only when they point at the same
+            #    area; a distant GPS fix never silently overrides an explicitly
+            #    named location (and vice versa).
+            state.location_name = parsed_name
+            if parsed_coords and explicit_location:
+                if _haversine_km(parsed_coords, explicit_location) <= GPS_REFINEMENT_DISTANCE_KM:
+                    # Same area: prefer the precise GPS fix over the coarse port centroid.
+                    state.location_coords = explicit_location
+                else:
+                    # Explicitly named place wins over a distant GPS fix.
+                    state.location_coords = parsed_coords
+            elif parsed_coords:
+                state.location_coords = parsed_coords
+            elif explicit_location:
+                # Named place without resolvable coordinates: evaluate at the device fix.
+                state.location_coords = explicit_location
+                planning_warnings.append(
+                    f"ADVISORY: Location '{state.location_name}' could not be geocoded; "
+                    f"evaluating at the provided device coordinates instead."
+                )
+            else:
+                # 2. Location specified in query but coordinates were not resolved
+                state.location_coords = None
                 planning_warnings.append(
                     f"ADVISORY: Specified location '{state.location_name}' is not an Indian coastal port or maritime sector. "
                     f"Navigation coordinates and marine advisories are unavailable for non-coastal locations."
