@@ -210,6 +210,35 @@ export const RoleSelectScreen: React.FC = () => {
           ))}
         </div>
 
+        {/* Restricted Administrator Entry — navigation only.
+            Authentication is enforced exclusively by the existing
+            /admin/authority route gate (AuthorityAdminConsole). */}
+        <div className="mt-8 flex justify-center">
+          <div className="w-full max-w-md rounded-xl ocean-glass border border-[#F5B942]/30 px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex items-center space-x-3 min-w-0">
+              <div className="w-9 h-9 shrink-0 rounded-lg bg-[#F5B942]/10 border border-[#F5B942]/30 flex items-center justify-center">
+                <ShieldAlert className="w-4 h-4 text-[#F5B942]" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] font-mono font-semibold tracking-widest text-[#F5B942]">
+                  SYSTEM ADMINISTRATION
+                </p>
+                <p className="text-xs text-slate-400 truncate">
+                  Restricted administrative access
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => navigate('/admin/authority')}
+              className="w-full sm:w-auto shrink-0 justify-center px-3.5 py-2 rounded-lg text-xs font-bold bg-[#F5B942]/15 border border-[#F5B942]/40 text-[#F5B942] hover:bg-[#F5B942]/25 hover:border-[#F5B942]/70 transition-all cursor-pointer flex items-center space-x-1.5"
+            >
+              <span>Administrator Login</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+
         {/* Security Notice */}
         <div className="mt-10 text-center">
           <p className="text-xs font-mono text-slate-400">
