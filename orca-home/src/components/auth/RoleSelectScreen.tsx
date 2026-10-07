@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useRole, UserRole } from '../../context/RoleContext';
 import { useI18n, SUPPORTED_LANGUAGES, LanguageCode } from '../../utils/i18n';
 import {
@@ -17,11 +18,12 @@ import {
 } from 'lucide-react';
 
 export const RoleSelectScreen: React.FC = () => {
+  const navigate = useNavigate();
   const { setRole } = useRole();
   const { t, language, setLanguage } = useI18n();
 
   const handleSelectRole = (selectedRole: UserRole) => {
-    setRole(selectedRole);
+    navigate(`/login/${selectedRole}`);
   };
 
   const ROLES_CONFIG: Array<{
@@ -142,7 +144,7 @@ export const RoleSelectScreen: React.FC = () => {
         <div className="text-center max-w-3xl mx-auto mb-12">
           <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-[#16C7C7]/10 text-[#28D7E5] font-mono text-xs mb-3 border border-[#16C7C7]/30">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>ROLE-BASED DEMO ENTRY GATE</span>
+            <span>ROLE-BASED AUTHENTICATION GATE</span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-extrabold text-white font-heading tracking-tight mb-3">
             {t('roles.title', 'ORCA MARINE INTELLIGENCE PLATFORM')}
@@ -201,17 +203,17 @@ export const RoleSelectScreen: React.FC = () => {
                 onClick={() => handleSelectRole(roleCard.id)}
                 className={`w-full py-3 px-4 rounded-xl text-xs flex items-center justify-center space-x-2 shadow-lg transition-all cursor-pointer ${roleCard.buttonBg}`}
               >
-                <span>{t('roles.continueAs', 'Continue as')} {roleCard.id.toUpperCase()}</span>
+                <span>Login as {roleCard.id.toUpperCase()}</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
           ))}
         </div>
 
-        {/* Demo Persistence Notice */}
+        {/* Security Notice */}
         <div className="mt-10 text-center">
           <p className="text-xs font-mono text-slate-400">
-            Client-Side Role Demo • No Password Required • Role persists across page reloads • Switch anytime via top navigation
+            Secure Role-Based Authentication • Server-Validated OTP &amp; Official Credentials • SIH 26176
           </p>
         </div>
       </main>

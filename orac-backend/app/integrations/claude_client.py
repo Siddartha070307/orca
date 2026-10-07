@@ -255,7 +255,9 @@ Respond ONLY with valid JSON.
                     "sea", "ocean", "water", "deep sea", "shore", "coast", "harbor", "port",
                     "fishing", "boat", "here", "there", "my location", "good fishing spots",
                     "safe", "caution", "the sea", "the ocean", "the shore", "go to fishing",
-                    "go fishing"
+                    "go fishing", "current coordinates", "my current coordinates",
+                    "current location", "my current location", "present location",
+                    "current position", "this location", "my position"
                 }
                 if cand_lower not in noise_words and len(candidate_clean) > 2:
                     if cand_lower in registry:

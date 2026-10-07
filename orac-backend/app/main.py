@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.models.db import init_db
 from app.api.routes import router
+from app.api.auth_routes import auth_router
 
 logging.basicConfig(
     level=logging.INFO,
@@ -21,6 +22,11 @@ async def lifespan(app: FastAPI):
     # Initialize SQLite database schema
     init_db()
     logger.info("Database schema initialized.")
+    if settings.ADMIN_SEED_ENABLED and settings.ADMIN_PASSWORD:
+        from app.models.db import SessionLocal
+        from app.services.admin_bootstrap import seed_default_admin
+        with SessionLocal() as db:
+            seed_default_admin(db)
     yield
     logger.info("Shutting down ORCA.")
 
@@ -45,6 +51,7 @@ app.add_middleware(
 
 # Mount API routes
 app.include_router(router)
+app.include_router(auth_router)
 
 
 @app.get("/")

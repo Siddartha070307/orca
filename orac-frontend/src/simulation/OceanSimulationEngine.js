@@ -1,5 +1,5 @@
 ﻿/**
- * ORCA 3D Ocean Simulation Engine â€” ocean3 Integration
+ * ORCA 3D Ocean Simulation Engine — ocean3 Integration
  * High-performance procedural Three.js ocean system with Gerstner waves,
  * dynamic weather/atmospheric engine, 32m commercial fishing trawler with
  * rotating radar & animated championship flags, dedicated PFZ GIS system,

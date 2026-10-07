@@ -51,11 +51,19 @@ def test_fallback_intent_parser_locations():
     assert chennai_res["has_explicit_location"] is True
     assert chennai_res["location_name"] == "Chennai"
 
-    # Non-coastal / inland location
+    # Non-coastal / inland location: geocoding is network-dependent, so the parser may
+    # either fail to resolve Delhi (coordinates None) or return Delhi's real inland
+    # coordinates. What must NEVER happen is silent substitution of a coastal sector
+    # (Kochi, Mangalore, ...) for an inland query.
     delhi_res = parser._fallback_intent_parser("Can I sail from Delhi today?", None)
     assert delhi_res["has_explicit_location"] is True
     assert delhi_res["location_name"] == "Delhi"
-    assert delhi_res["coordinates"] is None
+    delhi_coords = delhi_res["coordinates"]
+    if delhi_coords is None:
+        pass  # Geocoder unavailable: explicit non-resolution, no substitution.
+    else:
+        assert abs(delhi_coords["lat"] - 28.65) < 0.5, f"Unexpected substitution: {delhi_coords}"
+        assert abs(delhi_coords["lon"] - 77.23) < 0.5, f"Unexpected substitution: {delhi_coords}"
 
     # No location
     none_res = parser._fallback_intent_parser("What about tomorrow?", None)
@@ -152,7 +160,12 @@ def test_unrecognized_location_no_silent_substitution():
     assert data["location_name"] == "Delhi"
     planning_trace = next(t for t in data["agent_traces"] if t["agent"] == "PlanningAgent")
     assert planning_trace["result"]["location_name"] == "Delhi"
-    assert planning_trace["result"]["coordinates"] is None
+    # Coordinates are either explicitly unresolved (None) or Delhi's real inland
+    # position depending on geocoder availability — never a coastal port substitute.
+    coords = planning_trace["result"]["coordinates"]
+    if coords is not None:
+        assert abs(coords["lat"] - 28.65) < 0.5, f"Silent substitution detected: {coords}"
+        assert abs(coords["lon"] - 77.23) < 0.5, f"Silent substitution detected: {coords}"
     # Report should explicitly state Delhi and not Kochi or Mangalore
     assert "DELHI" in data["report"].upper()
     assert "MANGALORE" not in data["report"].upper()
