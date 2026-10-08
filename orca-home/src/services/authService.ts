@@ -41,6 +41,40 @@ export interface GenericResponse {
   status?: string;
 }
 
+/** Editable fields of a fisherman registration profile (all optional = "leave unchanged"). */
+export interface FishermanProfileUpdate {
+  age?: number;
+  location?: string;
+  vessel_name?: string;
+  vessel_registration_number?: string;
+  fishing_type?: string;
+  preferred_language?: string;
+  emergency_contact?: string;
+  government_id_type?: string;
+  government_id_number?: string;
+  emergency_contact_name?: string;
+  emergency_contact_relation?: string;
+  safety_tracking_consent?: boolean;
+}
+
+/** Administrator-driven "Register Fisherman" payload (server-side admin session authorises it). */
+export interface AdminFishermanCreate extends FishermanProfileUpdate {
+  phone_number: string;
+  name: string;
+  age: number;
+  location: string;
+}
+
+/** Administrator edit of a fisherman registration, including account activation. */
+export interface AdminFishermanUpdate extends FishermanProfileUpdate {
+  is_active?: boolean;
+}
+
+export interface FishermanDirectoryResponse {
+  fishermen: SafeUser[];
+  total: number;
+}
+
 export interface AuthorityRequestItem {
   user_id: string;
   full_name: string;
@@ -99,7 +133,11 @@ async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise
 
   if (!res.ok) {
     const detail = data?.detail || res.statusText || 'Request failed';
-    throw new Error(detail);
+    // Attach the HTTP status (additively) so callers can distinguish auth
+    // failures (401/403) from validation or server errors without parsing text.
+    const error = new Error(detail) as Error & { status?: number };
+    error.status = res.status;
+    throw error;
   }
 
   return data as T;
@@ -248,6 +286,40 @@ export const authService = {
     return apiFetch<GenericResponse>('/auth/admin/approve-authority', {
       method: 'POST',
       body: JSON.stringify({ authority_user_id, action, reason })
+    });
+  },
+
+  // --------------------------------------------------------------------------
+  // Fisherman Registration Management (server-side `require_admin` enforced)
+  // --------------------------------------------------------------------------
+  listFishermen: async (search?: string): Promise<FishermanDirectoryResponse> => {
+    const q = search ? `?search=${encodeURIComponent(search)}` : '';
+    return apiFetch<FishermanDirectoryResponse>(`/auth/admin/fishermen${q}`, {
+      method: 'GET'
+    });
+  },
+
+  createFisherman: async (payload: AdminFishermanCreate): Promise<SafeUser> => {
+    return apiFetch<SafeUser>('/auth/admin/fishermen', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  },
+
+  updateFisherman: async (userId: string, payload: AdminFishermanUpdate): Promise<SafeUser> => {
+    return apiFetch<SafeUser>(`/auth/admin/fishermen/${encodeURIComponent(userId)}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    });
+  },
+
+  // --------------------------------------------------------------------------
+  // Fisherman self-service registration edit (scoped to the session identity)
+  // --------------------------------------------------------------------------
+  updateMyFishermanProfile: async (payload: FishermanProfileUpdate): Promise<SafeUser> => {
+    return apiFetch<SafeUser>('/auth/fishermen/me/profile', {
+      method: 'PUT',
+      body: JSON.stringify(payload)
     });
   },
 

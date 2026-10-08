@@ -1,5 +1,5 @@
 """Pydantic schemas for ORCA Role-Based Authentication with strict validation."""
-from typing import Literal, Optional, Dict, Any
+from typing import Literal, Optional, Dict, Any, List
 from pydantic import BaseModel, Field, EmailStr, field_validator
 
 
@@ -149,3 +149,51 @@ class GenericMessageResponse(BaseModel):
     success: bool
     message: str
     status: Optional[str] = None
+
+
+# -----------------------------------------------------------------------------
+# Fisherman Registration (self-service profile edits + administrator management)
+# -----------------------------------------------------------------------------
+class FishermanProfileUpdateRequest(BaseModel):
+    """
+    Partial ("PATCH-style") update of a fisherman registration profile.
+
+    Semantics:
+      * omitted / None  -> field is left untouched
+      * "" (empty text) -> nullable text field is cleared
+      * safety_tracking_consent is a boolean toggle and is only written when present
+    """
+
+    age: Optional[int] = Field(None, ge=16, le=100, description="Age in years")
+    location: Optional[str] = Field(None, min_length=2, max_length=200, description="Base port / coastal village")
+    vessel_name: Optional[str] = Field(None, max_length=100)
+    vessel_registration_number: Optional[str] = Field(None, max_length=50)
+    fishing_type: Optional[str] = Field(None, max_length=50)
+    preferred_language: Optional[str] = Field(None, max_length=20)
+    emergency_contact: Optional[str] = Field(None, max_length=20, description="Emergency contact mobile number")
+    government_id_type: Optional[str] = Field(None, max_length=30, description="e.g. Aadhaar / Voter ID / Fishing Licence")
+    government_id_number: Optional[str] = Field(None, max_length=50)
+    emergency_contact_name: Optional[str] = Field(None, max_length=100)
+    emergency_contact_relation: Optional[str] = Field(None, max_length=50, description="e.g. Spouse, Parent, Crew")
+    safety_tracking_consent: Optional[bool] = Field(None, description="Consent to safety tracking / distress alerts")
+
+
+class AdminFishermanCreateRequest(FishermanProfileUpdateRequest):
+    """Administrator-driven fisherman registration (no OTP step: the server-side
+    administrator session is the authorisation, same as the other admin routes)."""
+
+    phone_number: str = Field(..., min_length=8, max_length=20, description="Registered mobile number")
+    name: str = Field(..., min_length=2, max_length=100, description="Full name of fisherman")
+    age: int = Field(..., ge=16, le=100, description="Age in years")
+    location: str = Field(..., min_length=2, max_length=200, description="Base port / coastal village")
+
+
+class AdminFishermanUpdateRequest(FishermanProfileUpdateRequest):
+    """Administrator edit: profile fields plus account activation state."""
+
+    is_active: Optional[bool] = Field(None, description="Enable or disable the fisherman account")
+
+
+class AdminFishermanListResponse(BaseModel):
+    fishermen: List[SafeUserProfileResponse]
+    total: int

@@ -1,12 +1,15 @@
 """SQLAlchemy database models and session setup."""
 from datetime import datetime, timezone
+import logging
 import uuid
 from sqlalchemy import (
     create_engine, Column, Integer, String, Float, DateTime, Text, JSON,
-    Boolean, ForeignKey, UniqueConstraint
+    Boolean, ForeignKey, UniqueConstraint, inspect as sqlalchemy_inspect, text
 )
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 from app.core.config import settings
+
+logger = logging.getLogger("orca.db")
 
 Base = declarative_base()
 
@@ -55,7 +58,28 @@ class FishermanProfile(Base):
     preferred_language = Column(String(20), default="en", nullable=False)
     emergency_contact = Column(String(20), nullable=True)
 
+    # --- Registration add-ons (integrated from the reference vessel.zip
+    # --- registration flow, adapted to ORCA's existing profile table).
+    # --- Additive columns only: no new tables, users, or role models.
+    government_id_type = Column(String(30), nullable=True)          # e.g. Aadhaar / Voter ID / Fishing licence
+    government_id_number = Column(String(50), nullable=True)
+    emergency_contact_name = Column(String(100), nullable=True)
+    emergency_contact_relation = Column(String(50), nullable=True)  # e.g. Spouse, Parent, Crew
+    safety_tracking_consent = Column(Boolean, default=False, nullable=False)
+
     user = relationship("User", back_populates="fisherman_profile")
+
+
+# Columns added after the first release of `fisherman_profiles`.
+# Base.metadata.create_all() never alters an existing table, so these are
+# appended with a guarded ALTER TABLE on startup (additive, never destructive).
+FISHERMAN_PROFILE_ADDITIVE_COLUMNS = (
+    ("government_id_type", "VARCHAR(30)"),
+    ("government_id_number", "VARCHAR(50)"),
+    ("emergency_contact_name", "VARCHAR(100)"),
+    ("emergency_contact_relation", "VARCHAR(50)"),
+    ("safety_tracking_consent", "BOOLEAN DEFAULT FALSE"),
+)
 
 
 class ResearcherProfile(Base):
@@ -152,6 +176,38 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 import os
 
 
+def ensure_fisherman_profile_columns(bind=None) -> None:
+    """
+    Additive, guarded migration for `fisherman_profiles`.
+
+    `Base.metadata.create_all()` only creates missing tables — it never adds
+    columns to tables that already exist (e.g. a pre-existing orca.db). This
+    helper inspects the live table and appends any registration columns that
+    are still missing. It never drops, renames, or rewrites existing columns.
+    """
+    target = bind or engine
+    try:
+        inspector = sqlalchemy_inspect(target)
+        if "fisherman_profiles" not in inspector.get_table_names():
+            return
+        existing = {col["name"] for col in inspector.get_columns("fisherman_profiles")}
+        missing = [col for col in FISHERMAN_PROFILE_ADDITIVE_COLUMNS if col[0] not in existing]
+        if not missing:
+            return
+        with target.begin() as connection:
+            for name, ddl_type in missing:
+                connection.execute(
+                    text(f"ALTER TABLE fisherman_profiles ADD COLUMN {name} {ddl_type}")
+                )
+        logger.info(
+            "Added %d missing column(s) to fisherman_profiles: %s",
+            len(missing),
+            ", ".join(name for name, _ in missing),
+        )
+    except Exception as exc:  # pragma: no cover - never block application startup
+        logger.warning("Unable to ensure fisherman_profiles columns: %s", exc)
+
+
 def init_db():
     """Initializes the database schema."""
     if "sqlite:///" in settings.DATABASE_URL:
@@ -160,6 +216,7 @@ def init_db():
         if dir_name:
             os.makedirs(dir_name, exist_ok=True)
     Base.metadata.create_all(bind=engine)
+    ensure_fisherman_profile_columns(engine)
 
 
 # Ensure schema tables exist whenever models are imported

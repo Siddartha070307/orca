@@ -14,8 +14,10 @@ import {
   Lock,
   LogOut,
   Mail,
-  AlertCircle
+  AlertCircle,
+  Users
 } from 'lucide-react';
+import { FishermenAdminPanel } from './FishermenAdminPanel';
 
 export const AuthorityAdminConsole: React.FC = () => {
   const navigate = useNavigate();
@@ -43,6 +45,9 @@ export const AuthorityAdminConsole: React.FC = () => {
     email: string;
   } | null>(null);
   const [actionReason, setActionReason] = useState<string>('');
+
+  // Management sections: authority access reviews vs fisherman registry
+  const [activeTab, setActiveTab] = useState<'requests' | 'fishermen'>('requests');
 
   const fetchRequests = async () => {
     if (!isAuthenticated || user?.role !== 'admin') return;
@@ -325,6 +330,44 @@ export const AuthorityAdminConsole: React.FC = () => {
           </div>
         )}
 
+        {/* Section tabs: authority access reviews vs fisherman registry */}
+        <div className="flex items-end gap-1.5 mb-6 border-b border-slate-800" role="tablist">
+          <button
+            role="tab"
+            aria-selected={activeTab === 'requests'}
+            onClick={() => setActiveTab('requests')}
+            className={`px-4 py-2.5 text-xs font-mono font-bold rounded-t-lg border-b-2 transition-all cursor-pointer ${
+              activeTab === 'requests'
+                ? 'border-[#F5B942] text-[#F5B942] bg-[#061F2C]'
+                : 'border-transparent text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <span className="flex items-center gap-2">
+              <Building2 className="w-3.5 h-3.5" />
+              Authority Access Requests
+            </span>
+          </button>
+          <button
+            role="tab"
+            aria-selected={activeTab === 'fishermen'}
+            onClick={() => setActiveTab('fishermen')}
+            className={`px-4 py-2.5 text-xs font-mono font-bold rounded-t-lg border-b-2 transition-all cursor-pointer ${
+              activeTab === 'fishermen'
+                ? 'border-[#16C7C7] text-[#28D7E5] bg-[#061F2C]'
+                : 'border-transparent text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <span className="flex items-center gap-2">
+              <Users className="w-3.5 h-3.5" />
+              Fishermen Registry
+            </span>
+          </button>
+        </div>
+
+        {activeTab === 'fishermen' ? (
+          <FishermenAdminPanel />
+        ) : (
+          <>
         {/* Filter bar */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
           <div className="flex items-center space-x-2">
@@ -583,6 +626,8 @@ export const AuthorityAdminConsole: React.FC = () => {
             </div>
           </div>
         )}
+        </>
+      )}
       </main>
 
       <footer className="ocean-glass border-t border-[#F5B942]/20 px-4 py-3 text-center text-xs text-slate-500 font-mono">

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { getStoredLanguage, setStoredLanguage, DEFAULT_LANGUAGE, VALID_LANGUAGE_CODES } from '../components/LanguageSelector';
+import { parseLanguageSyncMessage, readLanguageFromUrl } from './languageSync';
 
 // Import all 12 pre-generated locale dictionaries
 import en from './locales/en.json';
@@ -61,15 +62,40 @@ function interpolate(template, params) {
 
 export function I18nProvider({ children, initialLanguage }) {
   const [currentLanguage, setCurrentLanguage] = useState(() => {
-    return initialLanguage && VALID_LANGUAGE_CODES.has(initialLanguage)
-      ? initialLanguage
-      : getStoredLanguage();
+    // 1. `?lang=` from the orca-home shell wins on direct loads (new tab /
+    //    cross-app redirect) so the embedded and standalone views agree.
+    const urlLanguage = readLanguageFromUrl();
+    if (urlLanguage) {
+      setStoredLanguage(urlLanguage);
+      return urlLanguage;
+    }
+    // 2. Explicit prop, 3. persisted choice, 4. default.
+    if (initialLanguage && VALID_LANGUAGE_CODES.has(initialLanguage)) {
+      return initialLanguage;
+    }
+    return getStoredLanguage();
   });
 
   const changeLanguage = useCallback((code) => {
     const validated = setStoredLanguage(code);
     setCurrentLanguage(validated);
   }, []);
+
+  // Listen for validated language sync messages from the orca-home shell.
+  // The listener only ever *applies* a language — this app never posts back,
+  // so there is no possibility of a message loop between the two apps.
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+
+    const handleMessage = (event) => {
+      const language = parseLanguageSyncMessage(event);
+      if (!language) return;
+      changeLanguage(language);
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [changeLanguage]);
 
   const t = useCallback(
     (keyPath, defaultText = '', params = {}) => {

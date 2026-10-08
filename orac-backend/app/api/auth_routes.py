@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from typing import Optional, List, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, status, Request, Response
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -19,6 +20,10 @@ from app.models.auth_schemas import (
     FishermanSendOtpRequest,
     FishermanVerifyOtpRequest,
     FishermanSignupRequest,
+    FishermanProfileUpdateRequest,
+    AdminFishermanCreateRequest,
+    AdminFishermanUpdateRequest,
+    AdminFishermanListResponse,
     ResearcherSendSignupOtpRequest,
     ResearcherVerifySignupOtpRequest,
     ResearcherSignupRequest,
@@ -273,7 +278,12 @@ def build_safe_user_response(user: User) -> SafeUserProfileResponse:
             "vessel_registration_number": fp.vessel_registration_number,
             "fishing_type": fp.fishing_type,
             "preferred_language": fp.preferred_language,
-            "emergency_contact": fp.emergency_contact
+            "emergency_contact": fp.emergency_contact,
+            "government_id_type": fp.government_id_type,
+            "government_id_number": fp.government_id_number,
+            "emergency_contact_name": fp.emergency_contact_name,
+            "emergency_contact_relation": fp.emergency_contact_relation,
+            "safety_tracking_consent": bool(fp.safety_tracking_consent)
         }
     elif user.role == "researcher" and user.researcher_profile:
         rp = user.researcher_profile
@@ -1041,3 +1051,222 @@ def protected_researcher_endpoint(user: User = Depends(require_roles(["researche
 def protected_authority_endpoint(user: User = Depends(require_roles(["authority"]))):
     """Enforces approved authority role only."""
     return {"message": f"Hello Officer {user.full_name}, access granted.", "role": user.role}
+
+
+# -----------------------------------------------------------------------------
+# 7. Fisherman Registration: self-service profile + administrator management
+#    (functionality adapted from the reference vessel.zip registration flow,
+#     reusing ORCA's existing session/RBAC stack — no second user or role model)
+# -----------------------------------------------------------------------------
+def apply_fisherman_profile_update(profile: FishermanProfile, req: FishermanProfileUpdateRequest) -> None:
+    """
+    Applies a partial update onto an existing FishermanProfile.
+
+    None means "leave unchanged"; an empty string clears a nullable text field.
+    Fields that are nullable=False in the model (age, location) are only
+    reassigned when a valid non-empty value is supplied.
+    """
+    if req.age is not None:
+        profile.age = req.age
+
+    if req.location is not None and req.location.strip():
+        profile.location = req.location.strip()
+
+    if req.vessel_name is not None:
+        profile.vessel_name = req.vessel_name.strip() or None
+
+    if req.vessel_registration_number is not None:
+        profile.vessel_registration_number = req.vessel_registration_number.strip().upper() or None
+
+    if req.fishing_type is not None:
+        profile.fishing_type = req.fishing_type.strip() or None
+
+    if req.preferred_language is not None and req.preferred_language.strip():
+        profile.preferred_language = req.preferred_language.strip()
+
+    if req.emergency_contact is not None:
+        raw_contact = req.emergency_contact.strip()
+        profile.emergency_contact = normalize_phone(raw_contact) if raw_contact else None
+
+    if req.government_id_type is not None:
+        profile.government_id_type = req.government_id_type.strip() or None
+
+    if req.government_id_number is not None:
+        profile.government_id_number = req.government_id_number.strip() or None
+
+    if req.emergency_contact_name is not None:
+        profile.emergency_contact_name = req.emergency_contact_name.strip() or None
+
+    if req.emergency_contact_relation is not None:
+        profile.emergency_contact_relation = req.emergency_contact_relation.strip() or None
+
+    if req.safety_tracking_consent is not None:
+        profile.safety_tracking_consent = bool(req.safety_tracking_consent)
+
+
+@auth_router.put("/fishermen/me/profile", response_model=SafeUserProfileResponse)
+def update_own_fisherman_profile(
+    req: FishermanProfileUpdateRequest,
+    current_user: User = Depends(require_roles(["fisherman"])),
+    db: Session = Depends(get_db)
+):
+    """
+    Self-service registration edit.
+
+    Identity always comes from the validated session — a fisherman can only ever
+    modify their own profile (no user_id parameter is accepted), and this route
+    is restricted to the 'fisherman' role, so normal fishermen gain no ability to
+    view or edit anyone else's registration.
+    """
+    profile = current_user.fisherman_profile
+    if not profile:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No registration profile exists for the current account."
+        )
+
+    apply_fisherman_profile_update(profile, req)
+    current_user.updated_at = datetime.now(timezone.utc)
+    db.commit()
+    db.refresh(current_user)
+
+    return build_safe_user_response(current_user)
+
+
+@auth_router.get("/admin/fishermen", response_model=AdminFishermanListResponse)
+def list_fishermen(
+    search: Optional[str] = None,
+    active_only: bool = False,
+    current_admin: User = Depends(require_admin),
+    db: Session = Depends(get_db)
+):
+    """Administrator-only directory of registered fishermen."""
+    query = db.query(User).filter(User.role == "fisherman")
+
+    if active_only:
+        query = query.filter(User.is_active.is_(True))
+
+    term = (search or "").strip()
+    if term:
+        like = f"%{term}%"
+        query = query.outerjoin(FishermanProfile, FishermanProfile.user_id == User.id).filter(
+            or_(
+                User.full_name.ilike(like),
+                User.phone_number.ilike(like),
+                FishermanProfile.location.ilike(like),
+                FishermanProfile.vessel_name.ilike(like),
+                FishermanProfile.vessel_registration_number.ilike(like),
+                FishermanProfile.government_id_number.ilike(like)
+            )
+        )
+
+    users = query.order_by(User.created_at.desc()).all()
+    items = [build_safe_user_response(u) for u in users]
+    return AdminFishermanListResponse(fishermen=items, total=len(items))
+
+
+@auth_router.post(
+    "/admin/fishermen",
+    response_model=SafeUserProfileResponse,
+    status_code=status.HTTP_201_CREATED
+)
+def create_fisherman(
+    req: AdminFishermanCreateRequest,
+    current_admin: User = Depends(require_admin),
+    db: Session = Depends(get_db)
+):
+    """
+    Administrator-driven fisherman registration (mirrors the reference app's
+    "Register Fisherman" action). Authorisation is the server-side admin
+    session; the OTP signup flow for self-registration remains untouched.
+    """
+    phone = normalize_phone(req.phone_number)
+    if not is_valid_phone(phone):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="A valid 10-digit Indian mobile number is required."
+        )
+
+    existing = db.query(User).filter(User.phone_number == phone).first()
+    if existing:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="An account with this mobile number already exists."
+        )
+
+    name_parts = req.name.strip().split()
+    user = User(
+        role="fisherman",
+        first_name=name_parts[0],
+        last_name=" ".join(name_parts[1:]) if len(name_parts) > 1 else None,
+        full_name=req.name.strip(),
+        phone_number=phone,
+        email=None,
+        password_hash=None,
+        is_active=True,
+        is_verified=True,
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc)
+    )
+    db.add(user)
+    db.flush()
+
+    profile = FishermanProfile(
+        user_id=user.id,
+        age=req.age,
+        location=req.location.strip(),
+        vessel_name=req.vessel_name.strip() if req.vessel_name else None,
+        vessel_registration_number=req.vessel_registration_number.strip().upper() if req.vessel_registration_number else None,
+        fishing_type=req.fishing_type.strip() if req.fishing_type else None,
+        preferred_language=req.preferred_language or "en",
+        emergency_contact=normalize_phone(req.emergency_contact) if req.emergency_contact else None,
+        government_id_type=req.government_id_type.strip() if req.government_id_type else None,
+        government_id_number=req.government_id_number.strip() if req.government_id_number else None,
+        emergency_contact_name=req.emergency_contact_name.strip() if req.emergency_contact_name else None,
+        emergency_contact_relation=req.emergency_contact_relation.strip() if req.emergency_contact_relation else None,
+        safety_tracking_consent=bool(req.safety_tracking_consent)
+    )
+    db.add(profile)
+    db.commit()
+    db.refresh(user)
+
+    logger.info(
+        "Administrator %s registered fisherman %s (%s)",
+        current_admin.id, user.id, phone
+    )
+    return build_safe_user_response(user)
+
+
+@auth_router.put("/admin/fishermen/{user_id}", response_model=SafeUserProfileResponse)
+def update_fisherman(
+    user_id: str,
+    req: AdminFishermanUpdateRequest,
+    current_admin: User = Depends(require_admin),
+    db: Session = Depends(get_db)
+):
+    """Administrator-only edit of a fisherman registration (profile + activation)."""
+    user = db.query(User).filter(User.id == user_id, User.role == "fisherman").first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Fisherman account not found."
+        )
+
+    profile = user.fisherman_profile
+    if not profile:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Registration profile not found for this account."
+        )
+
+    apply_fisherman_profile_update(profile, req)
+
+    if req.is_active is not None:
+        user.is_active = bool(req.is_active)
+
+    user.updated_at = datetime.now(timezone.utc)
+    db.commit()
+    db.refresh(user)
+
+    logger.info("Administrator %s updated fisherman profile %s", current_admin.id, user.id)
+    return build_safe_user_response(user)
