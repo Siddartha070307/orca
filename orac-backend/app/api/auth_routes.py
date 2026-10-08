@@ -1,6 +1,8 @@
 """FastAPI route handlers for ORCA Role-Based Authentication and Access Control."""
 import logging
-from datetime import datetime, timezone
+import re
+import uuid
+from datetime import datetime, timezone, timedelta
 from typing import Optional, List, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, status, Request, Response
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -14,7 +16,8 @@ from app.models.db import (
     FishermanProfile,
     ResearcherProfile,
     AuthorityProfile,
-    SessionRecord
+    SessionRecord,
+    AlertRecord
 )
 from app.models.auth_schemas import (
     FishermanSendOtpRequest,
@@ -37,7 +40,12 @@ from app.models.auth_schemas import (
     SafeUserProfileResponse,
     AuthResponse,
     OtpDispatchResponse,
-    GenericMessageResponse
+    GenericMessageResponse,
+    FISHERMAN_ALERT_TYPES,
+    AdminAlertSendRequest,
+    AdminAlertDispatchResponse,
+    AdminAlertHistoryItem,
+    AdminAlertHistoryResponse
 )
 from app.services.auth_security import (
     hash_password,
@@ -52,6 +60,7 @@ from app.services.auth_security import (
 )
 from app.services.otp_service import OtpService
 from app.services.email_service import email_provider
+from app.dissemination.sms_client import sms_gateway
 
 logger = logging.getLogger("orca.auth")
 
@@ -1270,3 +1279,218 @@ def update_fisherman(
 
     logger.info("Administrator %s updated fisherman profile %s", current_admin.id, user.id)
     return build_safe_user_response(user)
+
+
+# -----------------------------------------------------------------------------
+# Fisherman Alert Sending (administrator-only marine safety SMS dispatch)
+# -----------------------------------------------------------------------------
+#: Compact alert templates adapted from the reference vessel.zip alert page.
+#: Kept within the 160-character GSM limit enforced by ORCA's SMS gateway.
+ALERT_TEMPLATES: Dict[str, str] = {
+    "CYCLONE": "ORCA ALERT: Severe cyclone near your fishing area. Strong winds/high waves. Move to safe harbor now. CG:1554",
+    "HIGH_WAVE": "ORCA ALERT: High waves detected near your position. Avoid going further offshore, move toward safe area.",
+    "STRONG_WIND": "ORCA ALERT: Strong winds in your fishing area. Follow the safe route and return toward shore if advised.",
+    "VESSEL_GEOFENCE": "ORCA ALERT: Your vessel is in a restricted/unsafe marine zone. Verify position and follow authorized navigation guidance.",
+    "RETURN_TO_SHORE": "ORCA ALERT: Weather deteriorating offshore. Return to the nearest safe landing port immediately.",
+    "EMERGENCY": "ORCA ALERT: Maritime hazard in your operating sector. Heed emergency broadcast, contact Coast Guard 1554 if in distress.",
+    "GENERAL": "ORCA ALERT: {{message}} Please follow safety instructions."
+}
+
+ALERT_DUPLICATE_WINDOW_SECONDS = 30
+
+
+def _mask_phone_for_alert(phone: Optional[str]) -> str:
+    """Masks all but the last 4 digits of a phone number for UI/audit display."""
+    digits = re.sub(r"\D", "", phone or "")
+    if len(digits) < 4:
+        return "****"
+    return f"+91******{digits[-4:]}"
+
+
+def _build_alert_message(
+    alert_type: str,
+    custom_message: Optional[str],
+    vessel_name: Optional[str]
+) -> str:
+    """Composes the final GSM-compliant (<=160 chars) alert text from the template."""
+    template = ALERT_TEMPLATES.get(alert_type, ALERT_TEMPLATES["GENERAL"])
+    note = (custom_message or "").strip()
+
+    if alert_type == "GENERAL":
+        message = template.replace("{{message}}", note or "Maritime safety advisory in effect.")
+    else:
+        message = template
+        if note:
+            message = f"{message} Note: {note}"
+
+    if vessel_name:
+        message = f"{message} Vessel: {vessel_name}."
+
+    # ORCA's SMS dissemination channel is strictly GSM: hard-truncate at 160,
+    # matching format_near_shore_sms() behaviour in app/dissemination.
+    return message[:160]
+
+
+@auth_router.post(
+    "/admin/fishermen/alerts",
+    response_model=AdminAlertDispatchResponse,
+    status_code=status.HTTP_201_CREATED
+)
+def send_fisherman_alert(
+    req: AdminAlertSendRequest,
+    current_admin: User = Depends(require_admin),
+    db: Session = Depends(get_db)
+):
+    """
+    Administrator-only marine safety alert dispatch to a registered fisherman.
+
+    Routes the composed message through ORCA's existing SMS dissemination
+    gateway (app.dissemination.sms_client.sms_gateway) and records an audit
+    entry in the additive `alerts` table — no parallel delivery mechanism.
+    """
+    recipient = db.query(User).filter(
+        User.id == req.recipient_user_id,
+        User.role == "fisherman"
+    ).first()
+    if not recipient:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Fisherman recipient not found."
+        )
+
+    if not recipient.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="This fisherman account is deactivated; alerts cannot be delivered."
+        )
+
+    phone = normalize_phone(recipient.phone_number or "")
+    if not is_valid_phone(phone):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="The registered mobile number for this fisherman is invalid."
+        )
+
+    alert_type = (req.alert_type or "GENERAL").upper()
+    if alert_type not in FISHERMAN_ALERT_TYPES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Unknown alert type. Allowed: {', '.join(FISHERMAN_ALERT_TYPES)}."
+        )
+
+    # Duplicate accidental-dispatch protection (same recipient + type within 30s)
+    window_start = datetime.now(timezone.utc) - timedelta(seconds=ALERT_DUPLICATE_WINDOW_SECONDS)
+    recent = db.query(AlertRecord).filter(
+        AlertRecord.recipient_user_id == str(recipient.id),
+        AlertRecord.alert_type == alert_type,
+        AlertRecord.created_at >= window_start
+    ).first()
+    if recent:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="An identical alert was recently dispatched to this fisherman. Please wait before resending."
+        )
+
+    profile = recipient.fisherman_profile if recipient.role == "fisherman" else None
+    vessel_name = getattr(profile, "vessel_name", None) if profile else None
+    final_message = _build_alert_message(alert_type, req.custom_message, vessel_name)
+    alert_id = f"ORCA-ALERT-{uuid.uuid4().hex[:8].upper()}"
+    now = datetime.now(timezone.utc)
+
+    record = AlertRecord(
+        id=alert_id,
+        alert_type=alert_type,
+        message=final_message,
+        recipient_user_id=str(recipient.id),
+        recipient_phone=phone,
+        recipient_name=recipient.full_name,
+        vessel_name=vessel_name,
+        status="PENDING",
+        provider=None,
+        char_count=len(final_message),
+        sent_by_admin_id=str(current_admin.id),
+        created_at=now
+    )
+    db.add(record)
+
+    # Dispatch through the existing pluggable ORCA SMS gateway.
+    dispatch_info = sms_gateway.send_sms(recipient=phone, text=final_message)
+
+    record.provider = dispatch_info.get("gateway") or "ORCA-SMSGateway"
+    record.status = "ACCEPTED" if dispatch_info.get("within_160_limit") else "FAILED"
+    if record.status == "FAILED":
+        record.failure_reason = "Message exceeded the 160-character GSM limit after composition."
+
+    db.commit()
+    db.refresh(record)
+
+    logger.info(
+        "Administrator %s dispatched %s alert %s to %s (%s)",
+        current_admin.id, alert_type, alert_id, recipient.full_name,
+        _mask_phone_for_alert(phone)
+    )
+
+    if record.status != "ACCEPTED":
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=record.failure_reason or "The SMS gateway could not dispatch the message."
+        )
+
+    return AdminAlertDispatchResponse(
+        success=True,
+        message="Alert accepted by the ORCA SMS simulator. No real SMS was transmitted.",
+        alert_id=alert_id,
+        alert_type=alert_type,
+        status=record.status,
+        provider=record.provider or "ORCA-SMSGateway",
+        recipient_masked=_mask_phone_for_alert(phone),
+        char_count=len(final_message),
+        within_160_limit=len(final_message) <= 160,
+        message_preview=final_message,
+        sent_at=now.isoformat()
+    )
+
+
+@auth_router.get(
+    "/admin/fishermen/alerts",
+    response_model=AdminAlertHistoryResponse
+)
+def list_fisherman_alerts(
+    status_filter: Optional[str] = None,
+    alert_type: Optional[str] = None,
+    limit: int = 50,
+    current_admin: User = Depends(require_admin),
+    db: Session = Depends(get_db)
+):
+    """Administrator-only alert dispatch audit history (recipient phones masked)."""
+    query = db.query(AlertRecord)
+
+    status_term = (status_filter or "").strip().upper()
+    if status_term and status_term != "ALL":
+        query = query.filter(AlertRecord.status == status_term)
+
+    type_term = (alert_type or "").strip().upper()
+    if type_term and type_term != "ALL":
+        query = query.filter(AlertRecord.alert_type == type_term)
+
+    max_rows = max(1, min(limit or 50, 100))
+    records = query.order_by(AlertRecord.created_at.desc()).limit(max_rows).all()
+
+    items = [
+        AdminAlertHistoryItem(
+            id=r.id,
+            alert_type=r.alert_type,
+            message=r.message,
+            recipient_masked=_mask_phone_for_alert(r.recipient_phone),
+            recipient_name=r.recipient_name,
+            vessel_name=r.vessel_name,
+            status=r.status,
+            provider=r.provider,
+            char_count=r.char_count,
+            failure_reason=r.failure_reason,
+            sent_by_admin_id=r.sent_by_admin_id,
+            created_at=r.created_at.isoformat() if r.created_at else ""
+        )
+        for r in records
+    ]
+    return AdminAlertHistoryResponse(alerts=items, total=len(items))

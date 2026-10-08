@@ -15,9 +15,11 @@ import {
   LogOut,
   Mail,
   AlertCircle,
-  Users
+  Users,
+  BellRing
 } from 'lucide-react';
 import { FishermenAdminPanel } from './FishermenAdminPanel';
+import { FishermenAlertsPanel } from './FishermenAlertsPanel';
 
 export const AuthorityAdminConsole: React.FC = () => {
   const navigate = useNavigate();
@@ -46,8 +48,8 @@ export const AuthorityAdminConsole: React.FC = () => {
   } | null>(null);
   const [actionReason, setActionReason] = useState<string>('');
 
-  // Management sections: authority access reviews vs fisherman registry
-  const [activeTab, setActiveTab] = useState<'requests' | 'fishermen'>('requests');
+  // Management sections: authority access reviews, fisherman registry, alert sending
+  const [activeTab, setActiveTab] = useState<'requests' | 'fishermen' | 'alerts'>('requests');
 
   const fetchRequests = async () => {
     if (!isAuthenticated || user?.role !== 'admin') return;
@@ -362,10 +364,27 @@ export const AuthorityAdminConsole: React.FC = () => {
               Fishermen Registry
             </span>
           </button>
+          <button
+            role="tab"
+            aria-selected={activeTab === 'alerts'}
+            onClick={() => setActiveTab('alerts')}
+            className={`px-4 py-2.5 text-xs font-mono font-bold rounded-t-lg border-b-2 transition-all cursor-pointer ${
+              activeTab === 'alerts'
+                ? 'border-[#F5B942] text-[#F5B942] bg-[#061F2C]'
+                : 'border-transparent text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <span className="flex items-center gap-2">
+              <BellRing className="w-3.5 h-3.5" />
+              Alert Sending
+            </span>
+          </button>
         </div>
 
         {activeTab === 'fishermen' ? (
           <FishermenAdminPanel />
+        ) : activeTab === 'alerts' ? (
+          <FishermenAlertsPanel />
         ) : (
           <>
         {/* Filter bar */}

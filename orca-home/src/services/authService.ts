@@ -75,6 +75,47 @@ export interface FishermanDirectoryResponse {
   total: number;
 }
 
+/** Administrator alert dispatch payload (recipient = fisherman user id). */
+export interface AdminAlertSend {
+  recipient_user_id: string;
+  alert_type: string;
+  custom_message?: string;
+}
+
+export interface AdminAlertDispatch {
+  success: boolean;
+  message: string;
+  alert_id: string;
+  alert_type: string;
+  status: string;
+  provider: string;
+  recipient_masked: string;
+  char_count: number;
+  within_160_limit: boolean;
+  message_preview: string;
+  sent_at: string;
+}
+
+export interface AdminAlertHistoryItem {
+  id: string;
+  alert_type: string;
+  message: string;
+  recipient_masked: string;
+  recipient_name?: string | null;
+  vessel_name?: string | null;
+  status: string;
+  provider?: string | null;
+  char_count: number;
+  failure_reason?: string | null;
+  sent_by_admin_id?: string | null;
+  created_at: string;
+}
+
+export interface AdminAlertHistory {
+  alerts: AdminAlertHistoryItem[];
+  total: number;
+}
+
 export interface AuthorityRequestItem {
   user_id: string;
   full_name: string;
@@ -320,6 +361,26 @@ export const authService = {
     return apiFetch<SafeUser>('/auth/fishermen/me/profile', {
       method: 'PUT',
       body: JSON.stringify(payload)
+    });
+  },
+
+  // --------------------------------------------------------------------------
+  // Fisherman Alert Sending (server-side `require_admin` enforced)
+  // --------------------------------------------------------------------------
+  sendFishermanAlert: async (payload: AdminAlertSend): Promise<AdminAlertDispatch> => {
+    return apiFetch<AdminAlertDispatch>('/auth/admin/fishermen/alerts', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  },
+
+  listFishermanAlerts: async (params?: { status?: string; alertType?: string }): Promise<AdminAlertHistory> => {
+    const q = new URLSearchParams();
+    if (params?.status) q.set('status_filter', params.status);
+    if (params?.alertType) q.set('alert_type', params.alertType);
+    const qs = q.toString();
+    return apiFetch<AdminAlertHistory>(`/auth/admin/fishermen/alerts${qs ? `?${qs}` : ''}`, {
+      method: 'GET'
     });
   },
 
