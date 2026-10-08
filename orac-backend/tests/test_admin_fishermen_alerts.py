@@ -5,6 +5,8 @@ Tests for the administrator Fisherman Alert Sending page:
   * 160-char GSM composition, template/note/vessel rules, audit persistence
   * duplicate-dispatch guard and history filtering / phone masking
 """
+import app.api.auth_routes as auth_routes
+from app.dissemination.sms_client import MockSMSGateway
 import pytest
 from datetime import datetime, timezone
 from fastapi.testclient import TestClient
@@ -26,6 +28,14 @@ TEST_DB_URL = "sqlite:///./test_orca_fishermen_alerts.db"
 test_engine = create_engine(TEST_DB_URL, connect_args={"check_same_thread": False})
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
 
+@pytest.fixture(autouse=True)
+def force_mock_sms_gateway(monkeypatch):
+    """Never send real SMS from automated tests."""
+    monkeypatch.setattr(
+        auth_routes,
+        "sms_gateway",
+        MockSMSGateway()
+    )
 
 def override_get_db():
     db = TestingSessionLocal()

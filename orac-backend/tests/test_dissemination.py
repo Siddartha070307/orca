@@ -1,10 +1,9 @@
 """Tests for multi-channel dissemination routing."""
 import pytest
-from app.dissemination.sms_client import format_near_shore_sms, sms_gateway
+from app.dissemination.sms_client import MockSMSGateway, format_near_shore_sms
 from app.dissemination.satellite_client import satellite_client
 from app.dissemination.router import dissemination_router
 from app.models.schemas import AgentResult
-
 
 def test_sms_length_constraint():
     """Verify that SMS for near-shore fishermen strictly complies with <= 160 characters."""
@@ -33,7 +32,10 @@ def test_sms_length_constraint():
     assert "DO NOT" in sms_unsafe
 
     # Test gateway dispatch validation
-    dispatch_res = sms_gateway.send_sms(recipient="+919876543210", text=sms_safe)
+    dispatch_res = MockSMSGateway().send_sms(
+        recipient="+919876543210",
+        text=sms_safe
+    )
     assert dispatch_res["within_160_limit"] is True
     assert dispatch_res["status"] == "DELIVERED_SIMULATED"
 

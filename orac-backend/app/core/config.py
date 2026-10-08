@@ -64,10 +64,19 @@ class Settings(BaseSettings):
     OTP_MAX_ATTEMPTS: int = 5
     OTP_RESEND_COOLDOWN_SECONDS: int = 30
 
-    # SMS Integration (Optional external providers)
-    SMS_PROVIDER: Optional[str] = None
+    # SMS Integration
+    SMS_PROVIDER: str = "mock"
+
+    # Legacy provider compatibility (deprecated aliases for older integrations)
     SMS_API_KEY: Optional[str] = None
     SMS_API_SECRET: Optional[str] = None
+
+    # TextBee SMS Gateway
+    TEXTBEE_API_KEY: Optional[str] = None
+    TEXTBEE_BASE_URL: str = "https://api.textbee.dev/api/v1"
+    TEXTBEE_DEVICE_ID: Optional[str] = None
+    TEXTBEE_SIM_SUBSCRIPTION_ID: Optional[int] = None
+    TEXTBEE_TIMEOUT_SECONDS: float = 15.0
 
     # Email Provider Settings
     EMAIL_PROVIDER: str = "development"

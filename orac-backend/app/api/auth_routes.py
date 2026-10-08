@@ -1417,9 +1417,14 @@ def send_fisherman_alert(
     dispatch_info = sms_gateway.send_sms(recipient=phone, text=final_message)
 
     record.provider = dispatch_info.get("gateway") or "ORCA-SMSGateway"
-    record.status = "ACCEPTED" if dispatch_info.get("within_160_limit") else "FAILED"
+    gateway_success = dispatch_info.get("success", True)
+    within_limit = dispatch_info.get("within_160_limit", False)
+    record.status = "ACCEPTED" if gateway_success and within_limit else "FAILED"
     if record.status == "FAILED":
-        record.failure_reason = "Message exceeded the 160-character GSM limit after composition."
+        record.failure_reason = (
+            dispatch_info.get("failure_reason")
+            or "The SMS gateway could not dispatch the message."
+        )
 
     db.commit()
     db.refresh(record)
@@ -1438,7 +1443,10 @@ def send_fisherman_alert(
 
     return AdminAlertDispatchResponse(
         success=True,
-        message="Alert accepted by the ORCA SMS simulator. No real SMS was transmitted.",
+        message=(
+            "Alert accepted by TextBee and queued for delivery."
+            if record.provider == "TextBee" else "Alert accepted by the ORCA SMS simulator. No real SMS was transmitted."
+        ),
         alert_id=alert_id,
         alert_type=alert_type,
         status=record.status,
