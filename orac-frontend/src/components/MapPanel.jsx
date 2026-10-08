@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import esriConfig from '@arcgis/core/config';
 import Map from '@arcgis/core/Map';
 import MapView from '@arcgis/core/views/MapView';
+import Basemap from '@arcgis/core/Basemap';
+import WebTileLayer from '@arcgis/core/layers/WebTileLayer';
 import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer';
 import Graphic from '@arcgis/core/Graphic';
 import Point from '@arcgis/core/geometry/Point';
@@ -29,6 +31,137 @@ import { escapeHtml, formatSafeNumber } from '../utils/security';
 import { fetchZones } from '../api/orcaClient';
 import { ShieldAlert, Crosshair, Navigation, LocateFixed, MapPin, Compass, Play } from 'lucide-react';
 import { useTranslation } from '../i18n/useTranslation';
+
+// ---------------------------------------------------------------------------
+// Keyless basemap support
+// ArcGIS public basemaps require an API key. When VITE_ARCGIS_API_KEY is absent
+// we fall back to a free OpenStreetMap raster basemap rendered through the same
+// ArcGIS MapView (WebTileLayer), so the map still works with zero configuration.
+// WebTileLayer substitutes {level}/{col}/{row} (NOT {x}/{y}).
+// ---------------------------------------------------------------------------
+const OSM_TILE_URL = 'https://tile.openstreetmap.org/{level}/{col}/{row}.png';
+const OSM_ATTRIBUTION = '© OpenStreetMap contributors';
+
+function hasArcGisKey(key) {
+  return Boolean(key && typeof key === 'string' && key.trim().length > 0);
+}
+
+function createKeylessBasemap() {
+  return new Basemap({
+    title: 'OpenStreetMap',
+    id: 'orca-osm-basemap',
+    baseLayers: [
+      new WebTileLayer({
+        title: 'OpenStreetMap',
+        urlTemplate: OSM_TILE_URL,
+        copyright: OSM_ATTRIBUTION,
+        spatialReference: { wkid: 3857 }
+      })
+    ]
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Focus bounds helpers
+// Priority: backend map_bounds -> GeoJSON query features -> user GPS -> default
+// Never fabricates coordinates; invalid data simply returns null.
+// ---------------------------------------------------------------------------
+
+/** Validate a [minLon, minLat, maxLon, maxLat] tuple. */
+function isValidBounds(bounds) {
+  if (!Array.isArray(bounds) || bounds.length !== 4) return false;
+  const [minLon, minLat, maxLon, maxLat] = bounds.map(Number);
+  if (![minLon, minLat, maxLon, maxLat].every((n) => Number.isFinite(n))) return false;
+  if (minLat < -90 || maxLat > 90 || minLon < -180 || maxLon > 180) return false;
+  return minLon <= maxLon && minLat <= maxLat;
+}
+
+function isFiniteLonLat(lon, lat) {
+  return (
+    Number.isFinite(Number(lon)) &&
+    Number.isFinite(Number(lat)) &&
+    Number(lon) >= -180 &&
+    Number(lon) <= 180 &&
+    Number(lat) >= -90 &&
+    Number(lat) <= 90
+  );
+}
+
+/** Build a padded bounding box from a list of [lon, lat] points. */
+function boundsFromPoints(points) {
+  if (!Array.isArray(points) || points.length === 0) return null;
+  const valid = points.filter(([lon, lat]) => isFiniteLonLat(lon, lat));
+  if (valid.length === 0) return null;
+
+  let minLon = Infinity;
+  let minLat = Infinity;
+  let maxLon = -Infinity;
+  let maxLat = -Infinity;
+  valid.forEach(([lon, lat]) => {
+    if (lon < minLon) minLon = lon;
+    if (lat < minLat) minLat = lat;
+    if (lon > maxLon) maxLon = lon;
+    if (lat > maxLat) maxLat = lat;
+  });
+
+  // Minimum 0.25° margin (matches backend map_bounds padding) plus 15% span padding
+  const lonPad = Math.max(0.25, (maxLon - minLon) * 0.15);
+  const latPad = Math.max(0.25, (maxLat - minLat) * 0.15);
+
+  return [
+    Math.max(minLon - lonPad, -180),
+    Math.max(minLat - latPad, -90),
+    Math.min(maxLon + lonPad, 180),
+    Math.min(maxLat + latPad, 90)
+  ];
+}
+
+/** Recursively collect [lon, lat] pairs from any GeoJSON coordinates array. */
+function collectCoords(coords, out, depth = 0) {
+  if (!Array.isArray(coords) || depth > 6) return out;
+  if (coords.length >= 2 && typeof coords[0] === 'number' && typeof coords[1] === 'number') {
+    if (isFiniteLonLat(coords[0], coords[1])) out.push([coords[0], coords[1]]);
+    return out;
+  }
+  for (const child of coords) collectCoords(child, out, depth + 1);
+  return out;
+}
+
+/**
+ * Derive focus bounds from query GeoJSON + user location when the backend
+ * did not return map_bounds. Nationwide restricted polygons are deliberately
+ * excluded so the view focuses on the queried area instead of zooming out
+ * to the entire coastline.
+ */
+function deriveFocusBounds(geojson, userLocation) {
+  try {
+    const features = Array.isArray(geojson?.features) ? geojson.features : [];
+    const points = [];
+
+    for (const feature of features) {
+      const geometry = feature?.geometry;
+      if (!geometry || !Array.isArray(geometry.coordinates)) continue;
+
+      // Nationwide / catalog restricted polygons would blow the extent out to
+      // the full coastline; they are reference overlays, not query focus.
+      if (geometry.type === 'Polygon' || geometry.type === 'MultiPolygon') continue;
+
+      collectCoords(geometry.coordinates, points);
+    }
+
+    const fromGeojson = boundsFromPoints(points);
+    if (fromGeojson) return fromGeojson;
+
+    if (userLocation && isFiniteLonLat(userLocation.lon, userLocation.lat)) {
+      return boundsFromPoints([[Number(userLocation.lon), Number(userLocation.lat)]]);
+    }
+
+    return null;
+  } catch (err) {
+    console.warn('Unable to derive map focus bounds from query data:', err);
+    return null;
+  }
+}
 
 export default function MapPanel({
   visualization,
@@ -64,6 +197,19 @@ export default function MapPanel({
 
   // Sanitize query GeoJSON
   const geojson = useMemo(() => sanitizeFeatureCollection(rawGeojson), [rawGeojson]);
+
+  // Focus bounds priority:
+  //   1. Backend visualization.map_bounds (authoritative, includes margin)
+  //   2. Derived from query GeoJSON (user/PFZ/route points, GPS position)
+  //   3. Derived from device GPS (userLocation)
+  //   4. null -> keep the default maritime center (never fabricate coordinates)
+  const focusBounds = useMemo(() => {
+    if (isValidBounds(mapBounds)) return mapBounds.map(Number);
+    return deriveFocusBounds(geojson, userLocation);
+  }, [mapBounds, geojson, userLocation]);
+
+  // Stable identity string so downstream effects don't refire on identical bounds
+  const focusBoundsKey = focusBounds ? focusBounds.map((n) => Number(n).toFixed(4)).join(',') : '';
 
   // Set ArcGIS API Key once
   useEffect(() => {
@@ -111,15 +257,13 @@ export default function MapPanel({
 
   // Initialize ArcGIS Map and MapView (once per component lifecycle)
   useEffect(() => {
-    if (!arcgisApiKey || arcgisApiKey.trim() === '') {
-      return;
-    }
     const container = mapContainerRef.current;
     if (!container || !(container instanceof HTMLElement) || viewRef.current) {
       return;
     }
 
     let isMounted = true;
+    const keyless = !hasArcGisKey(arcgisApiKey);
 
     try {
       // Create dedicated GraphicsLayers for clear layer hierarchy
@@ -130,9 +274,11 @@ export default function MapPanel({
       const pfzLayer = new GraphicsLayer({ id: 'orca-pfz-candidates', title: 'PFZ Candidates' });
       const gpsLayer = new GraphicsLayer({ id: 'orca-user-gps', title: 'User GPS' });
 
-      // Colorful marine/oceanic ArcGIS basemap (arcgis/oceans provides bathymetric blue water & land context)
+      // With an ArcGIS key: colorful marine/oceanic ArcGIS basemap (bathymetric
+      // blue water & land context). Without a key: free OpenStreetMap raster
+      // basemap through the same ArcGIS view (no key required).
       const map = new Map({
-        basemap: 'arcgis/oceans',
+        basemap: keyless ? createKeylessBasemap() : 'arcgis/oceans',
         layers: [
           restrictedZonesLayer,
           catalogZonesLayer,
@@ -608,15 +754,20 @@ export default function MapPanel({
     }
   }, [mapLoaded, showCatalogZones, deduplicatedCatalogZones, t]);
 
-  // Handle Advisory Bounds auto-fitting on query changes
-  useEffect(() => {
-    if (!mapLoaded || !viewRef.current) return;
-    if (!mapBounds || !Array.isArray(mapBounds) || mapBounds.length !== 4) return;
-    const [minLon, minLat, maxLon, maxLat] = mapBounds;
-    if (isNaN(minLon) || isNaN(minLat) || isNaN(maxLon) || isNaN(maxLat)) return;
-
+  // Shared: smoothly fit the view to a [minLon, minLat, maxLon, maxLat] tuple
+  const fitBoundsTo = useCallback((bounds, duration = 800) => {
+    const view = viewRef.current;
+    if (!view || !isValidBounds(bounds)) return;
+    const [minLon, minLat, maxLon, maxLat] = bounds.map(Number);
     const centerLon = (minLon + maxLon) / 2;
     const centerLat = (minLat + maxLat) / 2;
+
+    // Resilient fallback: center directly on calculated geographic midpoint
+    const fallbackToCenter = () => {
+      if (viewRef.current) {
+        viewRef.current.goTo({ center: [centerLon, centerLat], zoom: 9 }, { duration }).catch(() => {});
+      }
+    };
 
     try {
       const extent = new Extent({
@@ -626,18 +777,18 @@ export default function MapPanel({
         ymax: maxLat,
         spatialReference: { wkid: 4326 }
       });
-      viewRef.current.goTo(extent.expand(1.25), { duration: 800 }).catch((err) => {
-        // Resilient fallback: center directly on calculated geographic midpoint
-        if (viewRef.current) {
-          viewRef.current.goTo({ center: [centerLon, centerLat], zoom: 9 }, { duration: 800 }).catch(() => {});
-        }
-      });
+      view.goTo(extent.expand(1.25), { duration }).catch(fallbackToCenter);
     } catch (e) {
-      if (viewRef.current) {
-        viewRef.current.goTo({ center: [centerLon, centerLat], zoom: 9 }, { duration: 800 }).catch(() => {});
-      }
+      fallbackToCenter();
     }
-  }, [mapLoaded, mapBounds, queryId]);
+  }, []);
+
+  // Handle Advisory Bounds auto-fitting on query changes.
+  // focusBoundsKey keeps this from refiring when the derived tuple is unchanged.
+  useEffect(() => {
+    if (!mapLoaded || !viewRef.current || !focusBoundsKey) return;
+    fitBoundsTo(focusBounds, 800);
+  }, [mapLoaded, focusBoundsKey, queryId, fitBoundsTo]);
 
   // Action: Center on User GPS
   const handleCenterGps = useCallback(() => {
@@ -651,34 +802,10 @@ export default function MapPanel({
     ).catch(() => {});
   }, [userLocation]);
 
-  // Action: Fit Advisory Bounds
+  // Action: Fit Advisory Bounds (uses the same priority chain as auto-fit)
   const handleFitAdvisoryBounds = useCallback(() => {
-    if (!viewRef.current || !mapBounds || !Array.isArray(mapBounds) || mapBounds.length !== 4) return;
-    const [minLon, minLat, maxLon, maxLat] = mapBounds;
-    if (isNaN(minLon) || isNaN(minLat) || isNaN(maxLon) || isNaN(maxLat)) return;
-
-    const centerLon = (minLon + maxLon) / 2;
-    const centerLat = (minLat + maxLat) / 2;
-
-    try {
-      const extent = new Extent({
-        xmin: minLon,
-        ymin: minLat,
-        xmax: maxLon,
-        ymax: maxLat,
-        spatialReference: { wkid: 4326 }
-      });
-      viewRef.current.goTo(extent.expand(1.25), { duration: 600 }).catch(() => {
-        if (viewRef.current) {
-          viewRef.current.goTo({ center: [centerLon, centerLat], zoom: 9 }, { duration: 600 }).catch(() => {});
-        }
-      });
-    } catch (e) {
-      if (viewRef.current) {
-        viewRef.current.goTo({ center: [centerLon, centerLat], zoom: 9 }, { duration: 600 }).catch(() => {});
-      }
-    }
-  }, [mapBounds]);
+    fitBoundsTo(focusBounds, 600);
+  }, [fitBoundsTo, focusBounds]);
 
   // Summary counts for fallback display
   const pfzCount = useMemo(() => {
@@ -696,9 +823,11 @@ export default function MapPanel({
     return f1?.properties || null;
   }, [geojson]);
 
-  // Graceful Fallback UI if API Key is missing or initialization fails
-  const hasKey = Boolean(arcgisApiKey && arcgisApiKey.trim().length > 0);
-  const showFallback = !hasKey || Boolean(initError);
+  // Graceful Fallback UI only when the map engine itself fails to initialize.
+  // A missing VITE_ARCGIS_API_KEY is NOT an error: the map renders with the
+  // free OpenStreetMap basemap instead.
+  const hasKey = hasArcGisKey(arcgisApiKey);
+  const showFallback = Boolean(initError);
 
   if (showFallback) {
     return (
@@ -713,18 +842,16 @@ export default function MapPanel({
               <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, color: 'var(--marine-blue)', fontSize: '1.05rem', marginBottom: '4px' }}>
                 ArcGIS Marine Geospatial Integration
               </div>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', margin: 0, lineHeight: 1.45 }}>
-                {!hasKey
-                  ? 'To view live ArcGIS marine oceans, bathymetry, coastlines, and navigation charts, configure your ArcGIS API key in .env:'
-                  : `ArcGIS map initialization notice: ${initError}`}
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.82rem', margin: 0, lineHeight: 1.45 }}>
+                {`ArcGIS map initialization notice: ${initError}`}
               </p>
+              {!hasKey && (
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.78rem', margin: '8px 0 0', lineHeight: 1.45 }}>
+                  Optional: add an ArcGIS API key to <code>.env</code> (<code>VITE_ARCGIS_API_KEY</code>) to use the
+                  ArcGIS marine oceans basemap instead of the default OpenStreetMap basemap.
+                </p>
+              )}
             </div>
-
-            {!hasKey && (
-              <div className="map-fallback-code">
-                VITE_ARCGIS_API_KEY=your_arcgis_api_key_here
-              </div>
-            )}
 
             {/* Advisory Data Continuity Card: User still has access to all evaluated data */}
             {geojson && (
@@ -813,7 +940,7 @@ export default function MapPanel({
           </button>
         )}
 
-        {mapBounds && (
+        {focusBounds && (
           <button
             onClick={handleFitAdvisoryBounds}
             className="map-control-btn"
@@ -825,6 +952,13 @@ export default function MapPanel({
           </button>
         )}
       </div>
+
+      {/* Basemap attribution (required by OSM usage policy when keyless) */}
+      {!hasKey && (
+        <div className="map-attribution" title="Basemap provider">
+          {t('map.osmAttribution', 'Basemap © OpenStreetMap contributors')}
+        </div>
+      )}
 
       {/* Map Legend */}
       <div className="map-legend" role="complementary" aria-label="Map Symbology Legend">

@@ -1,20 +1,44 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Header } from '../components/sections/Header';
-import { ExternalLink, Anchor, Radio, RefreshCw, AlertCircle, Sparkles } from 'lucide-react';
+import { ExternalLink, Anchor, Radio, RefreshCw, AlertCircle, Sparkles, ClipboardCheck } from 'lucide-react';
 import { useI18n } from '../utils/i18n';
+import { buildOrcaFrontendUrl, postLanguageToIframe } from '../utils/languageSync';
+import { MyFishermanRegistrationModal } from './MyFishermanRegistrationModal';
 
 export const FishermanEmbedPage: React.FC = () => {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const [iframeLoading, setIframeLoading] = useState(true);
   const [iframeError, setIframeError] = useState(false);
+  const [showRegistration, setShowRegistration] = useState(false);
   const fishermanFrontendUrl = import.meta.env.VITE_ORAC_FRONTEND_URL || 'http://localhost:3000';
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // The embed URL is resolved once: `lang` seeds the Engine's initial language
+  // (used on direct load) while later changes are pushed via postMessage so the
+  // iframe never has to reload.
+  const [embedUrl] = useState(() =>
+    buildOrcaFrontendUrl(fishermanFrontendUrl, { role: 'fisherman', lang: language })
+  );
+
+  // Keep the embedded Engine in sync whenever the shell language changes.
+  const syncLanguage = useCallback(() => {
+    postLanguageToIframe(iframeRef.current, language);
+  }, [language]);
+
+  useEffect(() => {
+    syncLanguage();
+  }, [syncLanguage]);
 
   const handleOpenDedicatedTab = () => {
-    window.open(`${fishermanFrontendUrl}?role=fisherman`, '_blank', 'noopener,noreferrer');
+    window.open(
+      buildOrcaFrontendUrl(fishermanFrontendUrl, { role: 'fisherman', lang: language }),
+      '_blank',
+      'noopener,noreferrer'
+    );
   };
 
   const handleCrossAppRedirect = () => {
-    window.location.href = `${fishermanFrontendUrl}?role=fisherman`;
+    window.location.href = buildOrcaFrontendUrl(fishermanFrontendUrl, { role: 'fisherman', lang: language });
   };
 
   return (
@@ -38,6 +62,15 @@ export const FishermanEmbedPage: React.FC = () => {
         </div>
 
         <div className="flex items-center space-x-2.5">
+          <button
+            onClick={() => setShowRegistration(true)}
+            className="flex items-center space-x-1.5 px-3 py-1 rounded bg-[#082A36] border border-[#F5B942]/40 text-[#F5B942] hover:bg-[#F5B942]/15 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-[#F5B942]/60"
+            title="Review and update your fisherman registration"
+          >
+            <ClipboardCheck className="w-3.5 h-3.5" />
+            <span>My Registration</span>
+          </button>
+
           <button
             onClick={handleOpenDedicatedTab}
             className="flex items-center space-x-1.5 px-3 py-1 rounded bg-[#082A36] border border-[#16C7C7]/30 text-[#28D7E5] hover:bg-[#16C7C7]/15 transition-all cursor-pointer"
@@ -74,10 +107,15 @@ export const FishermanEmbedPage: React.FC = () => {
         )}
 
         <iframe
-          src={`${fishermanFrontendUrl}?role=fisherman`}
+          ref={iframeRef}
+          src={embedUrl}
           title="ORCA Fisherman Intelligence Engine"
           className="w-full h-full border-0 absolute inset-0"
-          onLoad={() => setIframeLoading(false)}
+          onLoad={() => {
+            setIframeLoading(false);
+            // Re-post once the child has mounted its message listener
+            syncLanguage();
+          }}
           onError={() => {
             setIframeLoading(false);
             setIframeError(true);
@@ -109,6 +147,12 @@ export const FishermanEmbedPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Fisherman self-service registration editor */}
+      <MyFishermanRegistrationModal
+        isOpen={showRegistration}
+        onClose={() => setShowRegistration(false)}
+      />
     </div>
   );
 };
