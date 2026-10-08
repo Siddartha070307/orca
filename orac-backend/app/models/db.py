@@ -165,6 +165,31 @@ class QueryRecord(Base):
     agent_traces_json = Column(JSON, nullable=True)
 
 
+class AlertRecord(Base):
+    """
+    Administrator-dispatched marine safety alerts to fishermen (audit trail).
+
+    Additive table created alongside the existing schema; existing tables are
+    never altered. Recipient details are stored as a snapshot so the audit
+    record survives later profile edits.
+    """
+    __tablename__ = "alerts"
+
+    id = Column(String(64), primary_key=True)
+    alert_type = Column(String(32), nullable=False)
+    message = Column(Text, nullable=False)
+    recipient_user_id = Column(String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    recipient_phone = Column(String(20), nullable=False)
+    recipient_name = Column(String(100), nullable=True)
+    vessel_name = Column(String(100), nullable=True)
+    status = Column(String(24), nullable=False, default="PENDING")
+    provider = Column(String(48), nullable=True)
+    char_count = Column(Integer, nullable=False, default=0)
+    sent_by_admin_id = Column(String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    failure_reason = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+
+
 engine = create_engine(
     settings.DATABASE_URL,
     connect_args={"check_same_thread": False} if "sqlite" in settings.DATABASE_URL else {}

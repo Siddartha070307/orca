@@ -197,3 +197,60 @@ class AdminFishermanUpdateRequest(FishermanProfileUpdateRequest):
 class AdminFishermanListResponse(BaseModel):
     fishermen: List[SafeUserProfileResponse]
     total: int
+
+
+# -----------------------------------------------------------------------------
+# Fisherman Alert Sending (administrator dispatch + audit history)
+# -----------------------------------------------------------------------------
+#: Alert types mirrored from the reference vessel.zip alert page templates.
+FISHERMAN_ALERT_TYPES = [
+    "HIGH_WAVE",
+    "STRONG_WIND",
+    "CYCLONE",
+    "VESSEL_GEOFENCE",
+    "RETURN_TO_SHORE",
+    "EMERGENCY",
+    "GENERAL"
+]
+
+
+class AdminAlertSendRequest(BaseModel):
+    """Administrator dispatch of a marine safety alert to one registered fisherman."""
+
+    recipient_user_id: str = Field(..., min_length=1, max_length=64, description="Fisherman user id from the registry")
+    alert_type: str = Field("GENERAL", max_length=32, description="One of FISHERMAN_ALERT_TYPES")
+    custom_message: Optional[str] = Field(None, max_length=120, description="Optional operator directive appended to the template")
+
+
+class AdminAlertDispatchResponse(BaseModel):
+    success: bool
+    message: str
+    alert_id: str
+    alert_type: str
+    status: str
+    provider: str
+    recipient_masked: str
+    char_count: int
+    within_160_limit: bool
+    message_preview: str
+    sent_at: str
+
+
+class AdminAlertHistoryItem(BaseModel):
+    id: str
+    alert_type: str
+    message: str
+    recipient_masked: str
+    recipient_name: Optional[str] = None
+    vessel_name: Optional[str] = None
+    status: str
+    provider: Optional[str] = None
+    char_count: int
+    failure_reason: Optional[str] = None
+    sent_by_admin_id: Optional[str] = None
+    created_at: str
+
+
+class AdminAlertHistoryResponse(BaseModel):
+    alerts: List[AdminAlertHistoryItem]
+    total: int
