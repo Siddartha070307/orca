@@ -184,11 +184,33 @@ class AlertRecord(Base):
     vessel_name = Column(String(100), nullable=True)
     status = Column(String(24), nullable=False, default="PENDING")
     provider = Column(String(48), nullable=True)
+    provider_message_id = Column(String(128), nullable=True)
     char_count = Column(Integer, nullable=False, default=0)
     sent_by_admin_id = Column(String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     failure_reason = Column(Text, nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
+class TextBeeWebhookEvent(Base):
+    """
+    Idempotency/audit record for TextBee webhook deliveries.
+
+    TextBee may retry the same webhook delivery. The idempotency key is stable
+    across retries and is therefore the unique event-delivery identifier.
+    """
+    __tablename__ = "textbee_webhook_events"
+
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    event_id = Column(String(128), nullable=False, unique=True, index=True)
+    idempotency_key = Column(String(128), nullable=True, unique=True, index=True)
+    event_type = Column(String(48), nullable=False)
+    sms_id = Column(String(128), nullable=True, index=True)
+    sms_batch_id = Column(String(128), nullable=True, index=True)
+    recipient_phone = Column(String(32), nullable=True)
+    processed_at = Column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc),
+    )
 
 engine = create_engine(
     settings.DATABASE_URL,
@@ -199,6 +221,108 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 import os
+
+ALERT_ADDITIVE_COLUMNS = [
+    ("provider_message_id", "VARCHAR(128)"),
+]
+
+TEXTBEE_WEBHOOK_ADDITIVE_COLUMNS = [
+    ("idempotency_key", "VARCHAR(128)"),
+    ("sms_id", "VARCHAR(128)"),
+]
+
+
+def ensure_alert_columns(bind=None) -> None:
+    """
+    Additive, guarded migration for the `alerts` table.
+
+    Existing alert records are preserved. Missing columns are added without
+    dropping, renaming, or rewriting existing columns.
+    """
+    target = bind or engine
+    try:
+        inspector = sqlalchemy_inspect(target)
+        if "alerts" not in inspector.get_table_names():
+            return
+
+        existing = {col["name"] for col in inspector.get_columns("alerts")}
+        missing = [
+            col for col in ALERT_ADDITIVE_COLUMNS
+            if col[0] not in existing
+        ]
+
+        if not missing:
+            return
+
+        with target.begin() as connection:
+            for name, ddl_type in missing:
+                connection.execute(
+                    text(f"ALTER TABLE alerts ADD COLUMN {name} {ddl_type}")
+                )
+
+        logger.info(
+            "Added %d missing column(s) to alerts: %s",
+            len(missing),
+            ", ".join(name for name, _ in missing),
+        )
+    except Exception as exc:  # pragma: no cover - never block application startup
+        logger.warning("Unable to ensure alerts columns: %s", exc)
+
+def ensure_textbee_webhook_events_table(bind=None) -> None:
+    """
+    Additive, guarded migration for TextBee webhook event tracking.
+
+    Creates the webhook event table on new databases and adds missing
+    webhook columns to existing databases without dropping or rewriting data.
+    """
+    target = bind or engine
+
+    try:
+        inspector = sqlalchemy_inspect(target)
+        table_names = inspector.get_table_names()
+
+        if "textbee_webhook_events" not in table_names:
+            TextBeeWebhookEvent.__table__.create(
+                bind=target,
+                checkfirst=True,
+            )
+            logger.info("Created TextBee webhook event table")
+            return
+
+        existing = {
+            col["name"]
+            for col in inspector.get_columns("textbee_webhook_events")
+        }
+
+        missing = [
+            column
+            for column in TEXTBEE_WEBHOOK_ADDITIVE_COLUMNS
+            if column[0] not in existing
+        ]
+
+        if not missing:
+            return
+
+        with target.begin() as connection:
+            for name, ddl_type in missing:
+                connection.execute(
+                    text(
+                        f"ALTER TABLE textbee_webhook_events "
+                        f"ADD COLUMN {name} {ddl_type}"
+                    )
+                )
+
+        logger.info(
+            "Added %d missing TextBee webhook column(s): %s",
+            len(missing),
+            ", ".join(name for name, _ in missing),
+        )
+
+    except Exception as exc:  # pragma: no cover - never block application startup
+        logger.warning(
+            "Unable to ensure TextBee webhook event table: %s",
+            exc,
+        )
 
 
 def ensure_fisherman_profile_columns(bind=None) -> None:
@@ -242,6 +366,8 @@ def init_db():
             os.makedirs(dir_name, exist_ok=True)
     Base.metadata.create_all(bind=engine)
     ensure_fisherman_profile_columns(engine)
+    ensure_alert_columns(engine)
+    ensure_textbee_webhook_events_table(engine)
 
 
 # Ensure schema tables exist whenever models are imported

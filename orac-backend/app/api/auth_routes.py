@@ -1,4 +1,7 @@
 """FastAPI route handlers for ORCA Role-Based Authentication and Access Control."""
+import hashlib
+import hmac
+import json
 import logging
 import re
 import uuid
@@ -7,6 +10,7 @@ from typing import Optional, List, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, status, Request, Response
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy import or_
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -17,7 +21,8 @@ from app.models.db import (
     ResearcherProfile,
     AuthorityProfile,
     SessionRecord,
-    AlertRecord
+    AlertRecord,
+    TextBeeWebhookEvent
 )
 from app.models.auth_schemas import (
     FishermanSendOtpRequest,
@@ -1417,6 +1422,7 @@ def send_fisherman_alert(
     dispatch_info = sms_gateway.send_sms(recipient=phone, text=final_message)
 
     record.provider = dispatch_info.get("gateway") or "ORCA-SMSGateway"
+    record.provider_message_id = dispatch_info.get("provider_message_id")
     gateway_success = dispatch_info.get("success", True)
     within_limit = dispatch_info.get("within_160_limit", False)
     record.status = "ACCEPTED" if gateway_success and within_limit else "FAILED"
@@ -1502,3 +1508,278 @@ def list_fisherman_alerts(
         for r in records
     ]
     return AdminAlertHistoryResponse(alerts=items, total=len(items))
+
+
+# -----------------------------------------------------------------------------
+# TextBee SMS Delivery Webhook
+# -----------------------------------------------------------------------------
+
+TEXTBEE_WEBHOOK_EVENTS = {
+    "MESSAGE_SENT": "SENT",
+    "MESSAGE_DELIVERED": "DELIVERED",
+    "MESSAGE_FAILED": "FAILED",
+    "UNKNOWN_STATE": "UNKNOWN",
+}
+
+TEXTBEE_STATUS_RANK = {
+    "PENDING": 0,
+    "ACCEPTED": 1,
+    "UNKNOWN": 2,
+    "SENT": 3,
+    "DELIVERED": 4,
+    "FAILED": 4,
+}
+
+
+@auth_router.post(
+    "/webhooks/textbee",
+    status_code=status.HTTP_200_OK,
+)
+async def textbee_delivery_webhook(
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    """
+    Receive and securely process TextBee SMS delivery events.
+
+    TextBee signs the exact raw request body with HMAC-SHA256 and sends the
+    lowercase hexadecimal digest in X-Signature.
+
+    The webhook is intentionally unauthenticated through ORCA JWT because
+    TextBee cannot provide a browser/user session. Authenticity is established
+    exclusively through the configured webhook signing secret.
+    """
+
+    webhook_secret = settings.TEXTBEE_WEBHOOK_SECRET
+
+    if not webhook_secret:
+        logger.error(
+            "TextBee webhook received but TEXTBEE_WEBHOOK_SECRET is not configured"
+        )
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="TextBee webhook is not configured.",
+        )
+
+    signature = request.headers.get("X-Signature", "").strip()
+
+    if not signature:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing TextBee webhook signature.",
+        )
+
+    raw_body = await request.body()
+
+    expected_signature = hmac.new(
+        webhook_secret.encode("utf-8"),
+        raw_body,
+        hashlib.sha256,
+    ).hexdigest()
+
+    if not hmac.compare_digest(signature.lower(), expected_signature):
+        logger.warning("Rejected TextBee webhook with invalid signature")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid TextBee webhook signature.",
+        )
+
+    try:
+        payload = json.loads(raw_body)
+    except json.JSONDecodeError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid JSON payload.",
+        )
+
+    if not isinstance(payload, dict):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="TextBee webhook payload must be a JSON object.",
+        )
+
+    event_type = str(payload.get("webhookEvent") or "").strip().upper()
+    idempotency_key = str(payload.get("idempotencyKey") or "").strip()
+    sms_id = str(payload.get("smsId") or "").strip()
+    sms_batch_id = str(payload.get("smsBatchId") or "").strip()
+    recipient = str(payload.get("recipient") or "").strip()
+
+    if not event_type or not idempotency_key or not sms_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Missing required TextBee webhook fields.",
+        )
+
+    if event_type not in TEXTBEE_WEBHOOK_EVENTS:
+        logger.info(
+            "Ignoring unsupported TextBee webhook event: %s",
+            event_type,
+        )
+        return {
+            "success": True,
+            "processed": False,
+            "message": "Unsupported TextBee event ignored.",
+        }
+
+    # -------------------------------------------------------------------------
+    # Idempotency
+    # -------------------------------------------------------------------------
+    existing_event = (
+        db.query(TextBeeWebhookEvent)
+        .filter(
+            TextBeeWebhookEvent.idempotency_key == idempotency_key
+        )
+        .first()
+    )
+
+    if existing_event:
+        logger.info(
+            "Ignoring duplicate TextBee webhook: %s",
+            idempotency_key,
+        )
+        return {
+            "success": True,
+            "processed": False,
+            "duplicate": True,
+        }
+
+    # -------------------------------------------------------------------------
+    # Store the webhook delivery before processing the alert.
+    # -------------------------------------------------------------------------
+    webhook_event = TextBeeWebhookEvent(
+        id=f"TEXTBEE-{uuid.uuid4().hex}",
+        event_id=idempotency_key,
+        idempotency_key=idempotency_key,
+        event_type=event_type,
+        sms_id=sms_id,
+        sms_batch_id=sms_batch_id or None,
+        recipient_phone=recipient or None,
+        processed_at=datetime.now(timezone.utc),
+    )
+
+    db.add(webhook_event)
+
+    # The idempotency key is unique. Flush now so concurrent duplicate
+    # deliveries cannot both proceed as new events.
+    try:
+        db.flush()
+    except IntegrityError:
+        db.rollback()
+        logger.info(
+            "Ignoring concurrent duplicate TextBee webhook: %s",
+            idempotency_key
+        )
+        return {
+            "success": True,
+            "processed": False,
+            "duplicate": True,
+        }
+
+    # -------------------------------------------------------------------------
+    # Outbound delivery events must identify the ORCA alert.
+    # -------------------------------------------------------------------------
+    if not sms_batch_id or not recipient:
+        db.commit()
+
+        logger.warning(
+            "TextBee %s webhook missing smsBatchId or recipient: %s",
+            event_type,
+            idempotency_key,
+        )
+
+        return {
+            "success": True,
+            "processed": False,
+            "message": "Webhook recorded but no outbound alert identifier was provided.",
+        }
+
+    normalized_recipient = normalize_phone(recipient)
+
+    alert = (
+        db.query(AlertRecord)
+        .filter(
+            AlertRecord.provider_message_id == sms_batch_id,
+            AlertRecord.recipient_phone == normalized_recipient,
+        )
+        .first()
+    )
+
+    if not alert:
+        db.commit()
+
+        logger.warning(
+            "No ORCA alert matched TextBee webhook batch=%s recipient=%s",
+            sms_batch_id,
+            _mask_phone_for_alert(normalized_recipient),
+        )
+
+        # The webhook itself is valid, so acknowledge it. Returning 4xx would
+        # make TextBee retry an event that ORCA cannot associate.
+        return {
+            "success": True,
+            "processed": False,
+            "message": "Webhook acknowledged; no matching ORCA alert found.",
+        }
+
+    new_status = TEXTBEE_WEBHOOK_EVENTS[event_type]
+    current_status = (alert.status or "PENDING").upper()
+
+    current_rank = TEXTBEE_STATUS_RANK.get(current_status, 0)
+    new_rank = TEXTBEE_STATUS_RANK.get(new_status, 0)
+
+    # -------------------------------------------------------------------------
+    # Never move an alert backwards in its delivery lifecycle.
+    # -------------------------------------------------------------------------
+
+    if current_status in {"DELIVERED", "FAILED"} and new_status != current_status:
+        db.commit()
+
+        return {
+            "success": True,
+            "processed": False,
+            "final_status": current_status,
+        }
+
+    if new_rank < current_rank:
+        db.commit()
+        return {
+            "success": True,
+            "processed": False,
+            "status_regression": True,
+            "status": current_status
+        }
+
+    alert.status = new_status
+
+    if new_status == "FAILED":
+        error_message = str(payload.get("errorMessage") or "").strip()
+
+        if error_message:
+            alert.failure_reason = error_message
+        else:
+            alert.failure_reason = "TextBee reported SMS delivery failure."
+
+    elif new_status == "UNKNOWN":
+        alert.failure_reason = (
+            "TextBee reported an unknown SMS delivery state."
+        )
+
+    elif new_status in {"SENT", "DELIVERED"}:
+        alert.failure_reason = None
+
+    db.commit()
+
+    logger.info(
+        "Updated ORCA alert %s from TextBee event %s: %s -> %s",
+        alert.id,
+        event_type,
+        current_status,
+        new_status,
+    )
+
+    return {
+        "success": True,
+        "processed": True,
+        "alert_id": alert.id,
+        "status": new_status,
+    }
