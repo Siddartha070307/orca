@@ -77,6 +77,7 @@ class Settings(BaseSettings):
     TEXTBEE_DEVICE_ID: Optional[str] = None
     TEXTBEE_SIM_SUBSCRIPTION_ID: Optional[int] = None
     TEXTBEE_TIMEOUT_SECONDS: float = 15.0
+    TEXTBEE_WEBHOOK_SECRET: Optional[str] = None
 
     # Email Provider Settings
     EMAIL_PROVIDER: str = "development"
