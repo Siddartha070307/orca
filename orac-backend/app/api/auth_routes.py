@@ -10,6 +10,7 @@ from typing import Optional, List, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, status, Request, Response
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy import or_
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -1657,6 +1658,22 @@ async def textbee_delivery_webhook(
     )
 
     db.add(webhook_event)
+
+    # The idempotency key is unique. Flush now so concurrent duplicate
+    # deliveries cannot both proceed as new events.
+    try:
+        db.flush()
+    except IntegrityError:
+        db.rollback()
+        logger.info(
+            "Ignoring concurrent duplicate TextBee webhook: %s",
+            idempotency_key
+        )
+        return {
+            "success": True,
+            "processed": False,
+            "duplicate": True,
+        }
 
     # -------------------------------------------------------------------------
     # Outbound delivery events must identify the ORCA alert.
